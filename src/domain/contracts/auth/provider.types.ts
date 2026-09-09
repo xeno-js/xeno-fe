@@ -1,0 +1,10 @@
+export type Provider =
+    | 'apple'
+    | 'discord'
+    | 'facebook'
+    | 'github'
+    | 'gitlab'
+    | 'google'
+    | 'linkedin'
+    | 'linkedin_oidc'
+    | 'spotify'

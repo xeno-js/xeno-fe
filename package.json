@@ -1,0 +1,117 @@
+{
+  "name": "@xeno-js/vue",
+  "version": "1.0.0",
+  "description": "Xeno fontend npm package for vue",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc-alias",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint --config eslint.config.mjs \"src/**/*.ts\" --max-warnings=0",
+    "lint:fix": "eslint --config eslint.config.mjs \"src/**/*.ts\" --fix --max-warnings=0",
+    "lint-staged": "lint-staged",
+    "commitlint": "commitlint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "check": "npm run typecheck && npm run lint:fix && npm run test",
+    "verify:commit": "npm run lint-staged && npm run test",
+    "verify:push": "npm run check",
+    "prepare": "husky",
+    "prepublishOnly": "npm run check && npm run build",
+    "release": "npm run prepublishOnly && npm publish"
+  },
+  "keywords": [
+    "ddd",
+    "clean-architecture",
+    "core",
+    "kernel",
+    "domain-driven-design",
+    "mediator",
+    "event-sourcing",
+    "cqrs",
+    "repository-pattern",
+    "supabase",
+    "zod"
+  ],
+  "author": "Xeno",
+  "license": "ISC",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "peerDependencies": {
+    "@sentry/vue": "^10.73.0",
+    "@supabase/supabase-js": "^2.112.4",
+    "@xeno-js/shared": "file:../xeno-shared",
+    "vue": "^3.5.41",
+    "vue-router": "^4.6.4",
+    "zod": "^4.4.3"
+  },
+  "peerDependenciesMeta": {
+    "@sentry/vue": {
+      "optional": true
+    },
+    "@supabase/supabase-js": {
+      "optional": true
+    },
+    "@xeno-js/shared": {
+      "optional": false
+    },
+    "vue": {
+      "optional": false
+    },
+    "vue-router": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
+    "@eslint/js": "^10.0.1",
+    "@sentry/vue": "^10.73.0",
+    "@supabase/supabase-js": "^2.112.4",
+    "@types/pg": "^8.20.0",
+    "@vercel/analytics": "^2.0.1",
+    "@vitest/coverage-v8": "^4.1.7",
+    "@xeno-js/shared": "file:../xeno-shared",
+    "aos": "^2.3.4",
+    "axios": "^1.20.0",
+    "eslint": "^10.4.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-simple-import-sort": "^13.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5",
+    "prettier": "^3.8.3",
+    "tsc-alias": "^1.9.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.60.0",
+    "vitest": "^4.1.7",
+    "vue": "^3.5.41",
+    "vue-router": "^4.6.4",
+    "vue-tsc": "^3.3.11",
+    "zod": "^4.4.3"
+  },
+  "overrides": {
+    "esbuild": "^0.25.0"
+  }
+}
