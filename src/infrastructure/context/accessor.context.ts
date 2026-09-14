@@ -29,6 +29,7 @@ export class RequestContextAccessor
           req: '',
           res: '',
         },
+        csrf: '',
       },
       tracing: {
         correlationId: GuidHelper.generate(),
