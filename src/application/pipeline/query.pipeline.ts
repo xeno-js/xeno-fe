@@ -1,13 +1,13 @@
 import type {
-    Delegate,
-    ICache,
-    ICacheKeyBuilder,
-    ILogger,
-    IQuery,
-    IRequest,
-    ResultType,
+  Delegate,
+  ICache,
+  ICacheKeyBuilder,
+  ILogger,
+  IQuery,
+  IRequest,
+  ResultType,
 } from '@xeno-js/shared'
-import { Guards, Result } from '@xeno-js/shared'
+import { Guards, REQUEST_TYPE, Result } from '@xeno-js/shared'
 
 import type { IPipeline } from '@/domain'
 
@@ -21,7 +21,7 @@ import type { IPipeline } from '@/domain'
    * @link https://github.com/Mattia-Carcione/xeno-js 
    */
 export class QueryCachingPipeline implements IPipeline {
-    /**
+  /**
      * @description Constructs a new instance of the QueryCachingPipeline class, which requires an ICache implementation for interacting with the cache and an ILogger for logging cache-related operations and errors. The constructor initializes the dependencies needed for the caching behavior to function properly within the CQRS pipeline.
      * @param _cacheService An instance of ICache used for interacting with the cache, including retrieving and storing cached responses based on cache keys.
      * @param _logger An instance of ILogger used for logging cache-related operations, such as cache hits, cache misses, and any errors that occur during cache read/write operations.
@@ -32,57 +32,63 @@ export class QueryCachingPipeline implements IPipeline {
      * @since 2025-09-30
      * @link https://github.com/Mattia-Carcione/xeno-js 
      */
-    constructor(
-        private readonly _cacheService: ICache,
-        private readonly _cacheKeyBuilder: ICacheKeyBuilder,
-        private readonly _logger: ILogger,
-    ) { }
+  constructor(
+    private readonly _cacheService: ICache,
+    private readonly _cacheKeyBuilder: ICacheKeyBuilder,
+    private readonly _logger: ILogger,
+  ) {}
 
-    public async handle<TResult>(request: IRequest<TResult>, next: Delegate<TResult>): Promise<ResultType<TResult>> {
-        const query = (request as IQuery)
-        if (Guards.isNullOrEmpty(query.cacheOptions) ||
-            Guards.isNullOrEmpty(query.cacheOptions.cacheKey))
-            return next()
+  public async handle<TResult>(
+    request: IRequest<TResult>,
+    next: Delegate<TResult>,
+  ): Promise<ResultType<TResult>> {
+    const query = request as IQuery
+    if (
+      Guards.isNullOrEmpty(query.cacheOptions) ||
+      Guards.isNullOrEmpty(query.cacheOptions.cacheKey) ||
+      request.type === REQUEST_TYPE.COMMAND
+    )
+      return next()
 
-        const bypass =
-            query.cacheOptions.bypassCache === true || query.cacheOptions.consistentRead === true
+    const bypass =
+      query.cacheOptions.bypassCache === true || query.cacheOptions.consistentRead === true
 
-        const key = query.cacheOptions.isUserScoped
-            ? this._cacheKeyBuilder.buildUserScopedKey(query.cacheOptions.cacheKey)
-            : this._cacheKeyBuilder.buildContextualKey(query.cacheOptions.cacheKey)
-        // 1. Read (Cache Hit)
-        if (!bypass) {
-            try {
-                const cachedResponse = await this._cacheService.get<TResult>(key)
-                if (Guards.isDefined(cachedResponse)) {
-                    this._logger.debug(
-                        `[Cache HIT] Returning data from cache for: ${query.cacheOptions.cacheKey}`,
-                    )
-                    return Result.ok(cachedResponse)
-                }
-            } catch (error) {
-                // If Redis fails, we don't crash the app. Log and proceed to the DB.
-                this._logger.warn(
-                    `[Cache ERROR] Unable to read cache for: ${query.cacheOptions.cacheKey}. Proceeding to DB. Error: ${error instanceof Error ? error.message : String(error)}`,
-                )
-            }
+    const key = query.cacheOptions.isUserScoped
+      ? this._cacheKeyBuilder.buildUserScopedKey(query.cacheOptions.cacheKey)
+      : this._cacheKeyBuilder.buildContextualKey(query.cacheOptions.cacheKey)
+    // 1. Read (Cache Hit)
+    if (!bypass) {
+      try {
+        const cachedResponse = await this._cacheService.get<TResult>(key)
+        if (Guards.isDefined(cachedResponse)) {
+          this._logger.debug(
+            `[Cache HIT] Returning data from cache for: ${query.cacheOptions.cacheKey}`,
+          )
+          return Result.ok(cachedResponse)
         }
-
-        // 2. Cache Miss: Delegate control to the Handler that queries the DB
-        const result = await next()
-
-        // 3. Write: If the Handler succeeded, save the result in cache
-        if (result.isOk()) {
-            try {
-                await this._cacheService.set(key, result.getValueOrThrow(), query.cacheOptions.ttl)
-                this._logger.debug(`[Cache SET] Data saved in cache for: ${key}`)
-            } catch (error) {
-                this._logger.warn(
-                    `[Cache ERROR] Unable to save cache for: ${key}. Error: ${error instanceof Error ? error.message : String(error)}`,
-                )
-            }
-        }
-
-        return result
+      } catch (error) {
+        // If Redis fails, we don't crash the app. Log and proceed to the DB.
+        this._logger.warn(
+          `[Cache ERROR] Unable to read cache for: ${query.cacheOptions.cacheKey}. Proceeding to DB. Error: ${error instanceof Error ? error.message : String(error)}`,
+        )
+      }
     }
+
+    // 2. Cache Miss: Delegate control to the Handler that queries the DB
+    const result = await next()
+
+    // 3. Write: If the Handler succeeded, save the result in cache
+    if (result.isOk()) {
+      try {
+        await this._cacheService.set(key, result.getValueOrThrow(), query.cacheOptions.ttl)
+        this._logger.debug(`[Cache SET] Data saved in cache for: ${key}`)
+      } catch (error) {
+        this._logger.warn(
+          `[Cache ERROR] Unable to save cache for: ${key}. Error: ${error instanceof Error ? error.message : String(error)}`,
+        )
+      }
+    }
+
+    return result
+  }
 }
