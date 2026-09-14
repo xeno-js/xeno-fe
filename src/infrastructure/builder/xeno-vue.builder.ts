@@ -1,14 +1,19 @@
 // infrastructure/builder/xeno-app.builder.ts
-import type {
-    IConfigurationService,
-    SetupAction,
-} from '@xeno-js/shared'
+import type { SupabaseClientOptions } from '@supabase/supabase-js'
+import type { AuthConfig, IConfigurationService, SetupAction } from '@xeno-js/shared'
+import { Guards } from '@xeno-js/shared'
 import type { InjectionKey } from 'vue'
 
 import type { XenoVueRegistry } from '@/domain'
 
 import { ViteConfigurationService } from '../configuration/vite-env.configuration'
-import type { CacheConfig, ContextConfig, FrontendAuthConfig, LoggerConfig, PipelineConfig } from '../modules'
+import type {
+  CacheConfig,
+  ContextConfig,
+  HttpCoreVueConfig,
+  LoggerConfig,
+  PipelineConfig,
+} from '../modules'
 
 export const XENO_SERVICES_KEY: InjectionKey<XenoVueRegistry> = Symbol('XENO_SERVICES')
 
@@ -21,171 +26,241 @@ export const XENO_SERVICES_KEY: InjectionKey<XenoVueRegistry> = Symbol('XENO_SER
  * @since 2025-09-30
  * @link https://github.com/Mattia-Carcione/xeno-js
  */
-export class XenoAppBuilder {
-    private readonly _configService: IConfigurationService
-    private readonly _tasks: ((srv: Partial<XenoVueRegistry>) => Promise<void>)[] = []
+export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry> {
+  private readonly _configService: IConfigurationService
+  private readonly _tasks: ((srv: Partial<TRegistry>) => Promise<void>)[] = []
 
-    private readonly _loggerConfig: LoggerConfig = {
-        console: true,
-        sentry: undefined,
-        customLogger: undefined,
-        level: undefined,
-    }
-    private readonly _configCache: CacheConfig = {
-        inMemory: true,
-        indexedDb: false
-    }
-    private readonly _pipelineConfig: PipelineConfig = {
-        queryCaching: false,
-        threshold: 500,
-        schemas: undefined
-    }
-    private readonly _contextConfig: ContextConfig = {
-        contextAccessor: undefined
-    }
-    private readonly _authConfig: FrontendAuthConfig = {
-        url: '',
-        key: '',
-        opts: undefined,
-        storageType: undefined,
-        redirectTo: undefined,
-        provider: 'google'
-    }
+  private readonly _loggerConfig: LoggerConfig = {
+    console: true,
+    sentry: undefined,
+    customLogger: undefined,
+    level: undefined,
+  }
+  private readonly _configCache: CacheConfig = {
+    inMemory: true,
+    indexedDb: false,
+  }
+  private readonly _pipelineConfig: PipelineConfig = {
+    queryCaching: false,
+    threshold: 500,
+    schemas: undefined,
+  }
+  private readonly _contextConfig: ContextConfig = {
+    contextAccessor: undefined,
+  }
+  private readonly _authConfig: AuthConfig<SupabaseClientOptions<'public'>> = {
+    url: '',
+    key: '',
+    opts: undefined,
+    storageOpts: {
+      type: undefined,
+      storage: undefined,
+      cookieOpts: undefined,
+    },
+    redirectTo: undefined,
+  }
 
-    private _isAuthConfigured = false
-    private _isCacheConfigured = false
-    private _isContextConfigured = false
-    private _isLoggerConfigured = false
-    private _isPipelineConfigured = false
+  private _isAuthConfigured = false
+  private _isCacheConfigured = false
+  private _isContextConfigured = false
+  private _isLoggerConfigured = false
+  private _isPipelineConfigured = false
 
-    private constructor(configService?: IConfigurationService) {
-        this._configService = configService ?? new ViteConfigurationService()
-        this._tasks.push(async (services) => {
-            services.envService = this._configService
-        })
-    }
+  private constructor(configService?: IConfigurationService) {
+    this._configService = configService ?? new ViteConfigurationService()
+    this._tasks.push(async (services) => {
+      services.envService = this._configService
+    })
+  }
 
-    public addCache(setup: SetupAction<CacheConfig, IConfigurationService>): XenoAppBuilder {
-        setup(this._configCache, this._configService)
+  public addCache(setup: SetupAction<CacheConfig, IConfigurationService>): this {
+    setup(this._configCache, this._configService)
 
-        this._queueCache()
-        return this
-    }
+    this._queueCache()
+    return this
+  }
 
-    public addPipeline(setup: SetupAction<PipelineConfig, IConfigurationService>): XenoAppBuilder {
-        if (this._isPipelineConfigured)
-            return this
+  public addPipeline(setup: SetupAction<PipelineConfig, IConfigurationService>): this {
+    if (this._isPipelineConfigured) return this
 
-        this._queueCache()
-        this._queueLogger()
+    this._queueCache()
+    this._queueLogger()
 
-        setup(this._pipelineConfig, this._configService)
-        this._tasks.push(async (services) => {
-            const { PipelineModule } = await import('../modules/pipeline.module')
-            const mediator = await PipelineModule.create(this._pipelineConfig, services.logger, services.cache, services.cacheKeyBuilder)
-            services.mediator = mediator;
-        })
+    setup(this._pipelineConfig, this._configService)
+    this._tasks.push(async (services) => {
+      const { PipelineModule } = await import('../modules/pipeline.module')
+      const mediator = await PipelineModule.create(
+        this._pipelineConfig,
+        services.logger,
+        services.cache,
+        services.cacheKeyBuilder,
+      )
+      services.mediator = mediator
+    })
 
-        this._isPipelineConfigured = true
-        return this
-    }
+    this._isPipelineConfigured = true
+    return this
+  }
 
-    /**
-     * Configures the logging module with fluent callback.
-     * Defers dynamic import of LoggerModule until build() execution.
-     */
-    public addLogger(setup: SetupAction<LoggerConfig, IConfigurationService>): this {
-        setup(this._loggerConfig, this._configService)
+  /**
+   * Configures the logging module with fluent callback.
+   * Defers dynamic import of LoggerModule until build() execution.
+   */
+  public addLogger(setup: SetupAction<LoggerConfig, IConfigurationService>): this {
+    setup(this._loggerConfig, this._configService)
 
-        this._queueLogger()
-        return this
-    }
+    this._queueLogger()
+    return this
+  }
 
-    public addContext(setup: SetupAction<ContextConfig, IConfigurationService>): this {
-        if(this._isContextConfigured)
-            return this
+  public addContext(setup: SetupAction<ContextConfig, IConfigurationService>): this {
+    if (this._isContextConfigured) return this
 
-        setup(this._contextConfig, this._configService)
-        this._tasks.push(async (services) => {
-            const { ContextModule } = await import('../modules/context.module')
-            const ctxAccessor = await ContextModule.create(this._contextConfig)
-            services.contextAccessor = ctxAccessor
-            services.identityAccessor = ctxAccessor
-        })
+    setup(this._contextConfig, this._configService)
+    this._tasks.push(async (services) => {
+      const { ContextModule } = await import('../modules/context.module')
+      const ctxAccessor = await ContextModule.create(this._contextConfig)
+      services.contextAccessor = ctxAccessor
+      services.identityAccessor = ctxAccessor
+    })
 
-        this._isContextConfigured = true
-        return this
-    }
+    this._isContextConfigured = true
+    return this
+  }
 
-    public addAuth(setup: SetupAction<FrontendAuthConfig, IConfigurationService>): this {
-        if (this._isAuthConfigured)
-            return this
+  public addAuth(
+    setup: SetupAction<AuthConfig<SupabaseClientOptions<'public'>>, IConfigurationService>,
+  ): this {
+    if (this._isAuthConfigured) return this
 
-        setup(this._authConfig, this._configService)
-        this._tasks.push(async (services) => {
-            const { AuthModule } = await import('../modules/auth.module')
-            services.authService = await AuthModule.create(this._authConfig)
-        })
+    setup(this._authConfig, this._configService)
+    this._tasks.push(async (services) => {
+      const { AuthModule } = await import('../modules/auth.module')
+      services.authService = await AuthModule.create(this._authConfig)
+    })
 
-        this._isAuthConfigured = true
-        return this
-    }
+    this._isAuthConfigured = true
+    return this
+  }
 
-    /**
-     * Static factory method to instantiate a new builder.
-     */
-    public static create(configService?: IConfigurationService): XenoAppBuilder {
-        return new XenoAppBuilder(configService)
-    }
+  /**
+   * @description Registra un DataSource remoto con un ecosistema Axios/Cockatiel completamente isolato.
+   * @param token Il token di registrazione type-safe dal Registry.
+   * @param setup Callback per configurare client, resilienza e la factory del DataSource.
+   */
+  public addHttpCore<K extends keyof TRegistry>(
+    token: K,
+    setup: SetupAction<HttpCoreVueConfig<TRegistry, K>, IConfigurationService>,
+  ): this {
+    const config = {
+      client: {
+        baseURL: undefined,
+        defaultHeaders: undefined,
+        timeoutMs: 5000,
+        keepAlive: true,
+        maxSockets: 100,
+        maxRedirects: 5,
+        decompress: true,
+      },
+      resilience: { retry: {}, circuitBreaker: {}, bulkhead: {} },
+      factory: undefined as unknown as HttpCoreVueConfig<TRegistry, K>['factory'],
+    } as HttpCoreVueConfig<TRegistry, K>
 
-    /**
-     * Asynchronously resolves all configured modules via lazy dynamic imports,
-     * assembles the dependency graph, and returns the frozen services container.
-     */
-    public async build(): Promise<XenoVueRegistry> {
-        try {
-            const services: Partial<XenoVueRegistry> = {}
-    
-            for (const task of this._tasks) {
-                await task(services)
-            }
-    
-            return Object.freeze(services as XenoVueRegistry)
+    setup(config, this._configService)
 
-        } catch(error: unknown) {
-            throw new Error(`Error during application bootstrap: ${(error as Error).message}.`, error as Error)
-        }
-    }
-
-    //===============================================
-    // PRIVATE REGION
-    //===============================================
-
-    private _queueCache() {
-        if (this._isCacheConfigured)
-            return this
-
-        this._tasks.push(async (services) => {
-            const { CacheModule } = await import('../modules/cache.module')
-            const { cache, cacheKeyBuilder } = await CacheModule.create(this._configCache, services.identityAccessor)
-            services.cache = cache;
-            services.cacheKeyBuilder = cacheKeyBuilder
-        })
-        this._isCacheConfigured = true
+    if (!Guards.isDefined(config.factory)) {
+      throw new Error(
+        `[XenoAppBuilder Error]: factory is required for HttpCore token '${String(token)}'`,
+      )
     }
 
-    private _queueLogger() {
-        if (this._isLoggerConfigured)
-            return this
+    this._tasks.push(async (services) => {
+      const { AxiosFactory } = await import('@xeno-js/shared')
+      const { CockatielResilienceFactory } = await import('@xeno-js/shared')
 
-        this._tasks.push(async (services) => {
-            const { LoggerModule } = await import('../modules/logger.module')
-            const logger = await LoggerModule.create(this._loggerConfig, services.contextAccessor)
-            services.logger = logger;
-        })
-        this._isLoggerConfigured = true
+      const httpClient = new AxiosFactory().create(config.client)
+      const resilience = new CockatielResilienceFactory().create(config.resilience)
+
+      const dataSource = config.factory(httpClient, resilience)
+
+      services[token] = dataSource
+    })
+
+    return this
+  }
+
+  /**
+   * @description Permette la registrazione massiva di più servizi in un unico blocco,
+   * garantendo la type-safety tramite il parametro `register` iniettato.
+   * @param setup Callback per orchestrare le registrazioni.
+   */
+  public addServices(
+    setup: (
+      config: IConfigurationService,
+      register: <K extends keyof TRegistry>(token: K, instance: TRegistry[K]) => void,
+      services: Partial<TRegistry>,
+    ) => void | Promise<void>,
+  ): this {
+    this._tasks.push(async (services) => {
+      const registerFn = <K extends keyof TRegistry>(token: K, instance: TRegistry[K]) => {
+        services[token] = instance
+      }
+
+      await setup(this._configService, registerFn, services)
+    })
+
+    return this
+  }
+
+  public static create<T extends XenoVueRegistry = XenoVueRegistry>(
+    configService?: IConfigurationService,
+  ): XenoAppBuilder<T> {
+    return new XenoAppBuilder<T>(configService)
+  }
+
+  public async build(): Promise<TRegistry> {
+    try {
+      const services: Partial<TRegistry> = {}
+
+      for (const task of this._tasks) {
+        await task(services)
+      }
+
+      return Object.freeze(services as TRegistry)
+    } catch (error: unknown) {
+      throw new Error(`Error during application bootstrap: ${(error as Error).message}.`, {
+        cause: error,
+      })
     }
+  }
+
+  //===============================================
+  // PRIVATE REGION
+  //===============================================
+
+  private _queueCache() {
+    if (this._isCacheConfigured) return this
+
+    this._tasks.push(async (services) => {
+      const { CacheModule } = await import('../modules/cache.module')
+      const { cache, cacheKeyBuilder } = await CacheModule.create(
+        this._configCache,
+        services.identityAccessor,
+      )
+      services.cache = cache
+      services.cacheKeyBuilder = cacheKeyBuilder
+    })
+    this._isCacheConfigured = true
+  }
+
+  private _queueLogger() {
+    if (this._isLoggerConfigured) return this
+
+    this._tasks.push(async (services) => {
+      const { LoggerModule } = await import('../modules/logger.module')
+      const logger = await LoggerModule.create(this._loggerConfig, services.contextAccessor)
+      services.logger = logger
+    })
+    this._isLoggerConfigured = true
+  }
 }
-
-
-
