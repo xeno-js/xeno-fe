@@ -337,9 +337,15 @@ Whether you are an individual developer or a business using Xeno, your support
 makes a real difference.
 
 👉
-**[Read our support guidelines and find out how to help](https://www.xeno-js.it/support-us?utm_source=gemini)**
+**[Read our support guidelines and find out how to help](https://www.xeno-js.it/support-us)**
 
 Thank you for being part of this decoupled open-source journey!
+
+<amp-bounce>
+</amp-bounce>
+<a href="https://www.buymeacoffee.com/xenojs" target="_blank">
+<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="42" style="height: 42px !important;" />
+</a>
 
 ---
 
