@@ -162,7 +162,6 @@ export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry>
         maxRedirects: 5,
         decompress: true,
       },
-      resilience: { retry: {}, circuitBreaker: {}, bulkhead: {} },
       factory: undefined as unknown as HttpCoreVueConfig<TRegistry, K>['factory'],
     } as HttpCoreVueConfig<TRegistry, K>
 
@@ -176,12 +175,10 @@ export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry>
 
     this._tasks.push(async (services) => {
       const { AxiosFactory } = await import('@xeno-js/shared')
-      const { CockatielResilienceFactory } = await import('@xeno-js/shared')
 
       const httpClient = new AxiosFactory().create(config.client)
-      const resilience = new CockatielResilienceFactory().create(config.resilience)
 
-      const dataSource = config.factory(httpClient, resilience)
+      const dataSource = config.factory(httpClient)
 
       services[token] = dataSource
     })
