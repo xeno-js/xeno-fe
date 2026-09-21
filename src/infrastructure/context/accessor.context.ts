@@ -30,6 +30,7 @@ export class RequestContextAccessor
           res: '',
         },
         csrf: '',
+        origin: window.location.origin,
       },
       tracing: {
         correlationId: GuidHelper.generate(),
