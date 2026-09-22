@@ -14,7 +14,7 @@ const VITE_PREFIX = 'VITE_'
  * @link https://github.com/xeno-js/xeno-js
  */
 export class ViteConfigurationService implements IConfigurationService {
-  constructor(private readonly _env: Record<string, unknown> = import.meta.env) {}
+  constructor(private readonly _env: Record<string, unknown> = import.meta.env ?? {}) {}
 
   public get(key: string, defaultValue?: string): Optional<string> {
     const fullKey = key.startsWith(VITE_PREFIX) ? key : `VITE_${key}`
