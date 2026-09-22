@@ -1,16 +1,24 @@
 {
   "name": "@xeno-js/vue",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Xeno fontend npm package for vue",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xeno-js/xeno-fe.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xeno-js/xeno-fe/issues"
+  },
+  "homepage": "https://www.xeno-js.it",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
@@ -20,7 +28,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && tsc-alias",
+    "build": "tsup",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint --config eslint.config.mjs \"src/**/*.ts\" --max-warnings=0",
     "lint:fix": "eslint --config eslint.config.mjs \"src/**/*.ts\" --fix --max-warnings=0",
@@ -59,7 +67,7 @@
   "peerDependencies": {
     "@sentry/vue": "^10.73.0",
     "@supabase/supabase-js": "^2.112.4",
-    "@xeno-js/shared": "file:../xeno-shared",
+    "@xeno-js/shared": "^0.1.2",
     "vue": "^3.5.41",
     "vue-router": "^4.6.4",
     "zod": "^4.4.3"
@@ -93,7 +101,7 @@
     "@types/pg": "^8.20.0",
     "@vercel/analytics": "^2.0.1",
     "@vitest/coverage-v8": "^4.1.7",
-    "@xeno-js/shared": "file:../xeno-shared",
+    "@xeno-js/shared": "^0.1.2",
     "aos": "^2.3.4",
     "axios": "^1.20.0",
     "eslint": "^10.4.0",
@@ -103,6 +111,7 @@
     "lint-staged": "^17.0.5",
     "prettier": "^3.8.3",
     "tsc-alias": "^1.9.2",
+    "tsup": "^8.5.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.60.0",
     "vitest": "^4.1.7",
@@ -110,8 +119,5 @@
     "vue-router": "^4.6.4",
     "vue-tsc": "^3.3.11",
     "zod": "^4.4.3"
-  },
-  "overrides": {
-    "esbuild": "^0.25.0"
   }
 }
