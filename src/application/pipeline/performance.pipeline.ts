@@ -10,7 +10,7 @@ import type { IPipeline } from '@/domain'
    * @author Xeno
    * @version 1.0.0
    * @since 2025-09-30
-   * @link https://github.com/Mattia-Carcione/xeno-js 
+   * @link https://github.com/xeno-js/xeno-js 
    */
 const defaultThresholdMs = 500
 
@@ -24,21 +24,21 @@ const defaultThresholdMs = 500
    * @author Xeno
    * @version 1.0.0
    * @since 2025-09-30
-   * @link https://github.com/Mattia-Carcione/xeno-js 
+   * @link https://github.com/xeno-js/xeno-js 
    */
 export class PerformancePipeline implements IPipeline {
-    /**
+  /**
      * @description Threshold in milliseconds for logging performance warnings. If a request takes longer than this threshold to execute, a warning will be logged. This value is set through the constructor and must be a positive integer.
     
      * 
      * @author Xeno
      * @version 1.0.0
      * @since 2025-09-30
-     * @link https://github.com/Mattia-Carcione/xeno-js 
+     * @link https://github.com/xeno-js/xeno-js 
      */
-    private readonly _thresholdMs: number
+  private readonly _thresholdMs: number
 
-    /**
+  /**
      * @description Constructs a new instance of the PerformancePipeline class, which requires an ILogger for logging. The pipeline will use this dependency to log performance-related information about each request being handled, including any warnings when execution times exceed the specified threshold.
      * @param _logger An instance of ILogger used for logging performance warnings related to the handling of requests.
      * @param thresholdMs An optional parameter that specifies the execution time threshold in milliseconds. If a request takes longer than this threshold to execute, a warning will be logged. The default value is 500ms.
@@ -48,31 +48,34 @@ export class PerformancePipeline implements IPipeline {
      * @author Xeno
      * @version 1.0.0
      * @since 2025-09-30
-     * @link https://github.com/Mattia-Carcione/xeno-js 
+     * @link https://github.com/xeno-js/xeno-js 
      */
-    constructor(
-        private readonly _logger: ILogger,
-        thresholdMs: number = defaultThresholdMs,
-    ) {
-        const message = `Invalid thresholdMs value: ${thresholdMs}. It must be a positive integer.`
-        Guards.throwIfNegative(thresholdMs, message)
-        if (thresholdMs === 0) {
-            throw new Error(message)
-        }
-        this._thresholdMs = thresholdMs
+  constructor(
+    private readonly _logger: ILogger,
+    thresholdMs: number = defaultThresholdMs,
+  ) {
+    const message = `Invalid thresholdMs value: ${thresholdMs}. It must be a positive integer.`
+    Guards.throwIfNegative(thresholdMs, message)
+    if (thresholdMs === 0) {
+      throw new Error(message)
     }
+    this._thresholdMs = thresholdMs
+  }
 
-    public async handle<TResult>(request: IRequest<TResult>, next: Delegate<TResult>): Promise<ResultType<TResult>> {
-        const startTime = performance.now()
-        try {
-            return await next()
-        } finally {
-            const endTime = performance.now()
-            const duration = endTime - startTime
+  public async handle<TResult>(
+    request: IRequest<TResult>,
+    next: Delegate<TResult>,
+  ): Promise<ResultType<TResult>> {
+    const startTime = performance.now()
+    try {
+      return await next()
+    } finally {
+      const endTime = performance.now()
+      const duration = endTime - startTime
 
-            if (duration > this._thresholdMs) {
-                this._logger.warn(`Performance warning: ${request.intent} took ${duration.toFixed(2)}ms`)
-            }
-        }
+      if (duration > this._thresholdMs) {
+        this._logger.warn(`Performance warning: ${request.intent} took ${duration.toFixed(2)}ms`)
+      }
     }
+  }
 }

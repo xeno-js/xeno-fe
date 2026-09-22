@@ -2,7 +2,7 @@
 import type { IConfigurationService, Optional } from '@xeno-js/shared'
 import { Guards } from '@xeno-js/shared'
 
-const VITE_PREFIX = 'VITE_';
+const VITE_PREFIX = 'VITE_'
 
 /**
  * @description Implementation of IConfigurationService for Vite/Browser environments.
@@ -11,47 +11,44 @@ const VITE_PREFIX = 'VITE_';
  * @author Xeno
  * @version 1.0.0
  * @since 2025-09-30
- * @link https://github.com/Mattia-Carcione/xeno-js
+ * @link https://github.com/xeno-js/xeno-js
  */
 export class ViteConfigurationService implements IConfigurationService {
-    constructor(
-        private readonly _env: Record<string, unknown> = import.meta.env,
-    ) { }
+  constructor(private readonly _env: Record<string, unknown> = import.meta.env) {}
 
-    public get(key: string, defaultValue?: string): Optional<string> {
-        const fullKey = key.startsWith(VITE_PREFIX) ? key : `VITE_${key}`
-        const value = String(this._env[fullKey])
+  public get(key: string, defaultValue?: string): Optional<string> {
+    const fullKey = key.startsWith(VITE_PREFIX) ? key : `VITE_${key}`
+    const value = String(this._env[fullKey])
 
-        if (!Guards.isNullOrEmpty(value))
-            return value
-        
-        return defaultValue
+    if (!Guards.isNullOrEmpty(value)) return value
+
+    return defaultValue
+  }
+
+  public getNumber(key: string, defaultValue?: number): Optional<number> {
+    const rawValue = this.get(key)
+    if (Guards.isDefined(rawValue)) {
+      const parsed = Number(rawValue)
+      if (!Number.isNaN(parsed)) return parsed
     }
+    return defaultValue
+  }
 
-    public getNumber(key: string, defaultValue?: number): Optional<number> {
-        const rawValue = this.get(key)
-        if (Guards.isDefined(rawValue)) {
-            const parsed = Number(rawValue)
-            if (!Number.isNaN(parsed)) return parsed
-        }
-        return defaultValue
+  public getBoolean(key: string, defaultValue?: boolean): Optional<boolean> {
+    const rawValue = this.get(key)
+    if (Guards.isDefined(rawValue)) {
+      const str = String(rawValue).toLowerCase().trim()
+      if (str.toLowerCase() === 'true' || str === '1') return true
+      if (str.toLowerCase() === 'false' || str === '0') return false
     }
+    return defaultValue
+  }
 
-    public getBoolean(key: string, defaultValue?: boolean): Optional<boolean> {
-        const rawValue = this.get(key)
-        if (Guards.isDefined(rawValue)) {
-            const str = String(rawValue).toLowerCase().trim()
-            if (str.toLowerCase() === 'true' || str === '1') return true
-            if (str.toLowerCase() === 'false' || str === '0') return false
-        }
-        return defaultValue
+  public getOrThrow(key: string): string {
+    const val = this.get(key)
+    if (!Guards.isDefined(val)) {
+      throw new Error(`[Configuration Error]: Missing required environment variable "${key}".`)
     }
-
-    public getOrThrow(key: string): string {
-        const val = this.get(key)
-        if (!Guards.isDefined(val)) {
-            throw new Error(`[Configuration Error]: Missing required environment variable "${key}".`)
-        }
-        return val
-    }
+    return val
+  }
 }

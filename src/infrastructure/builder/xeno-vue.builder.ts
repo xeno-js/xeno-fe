@@ -24,7 +24,7 @@ export const XENO_SERVICES_KEY: InjectionKey<XenoVueRegistry> = Symbol('XENO_SER
  * @author Xeno
  * @version 1.0.0
  * @since 2025-09-30
- * @link https://github.com/Mattia-Carcione/xeno-js
+ * @link https://github.com/xeno-js/xeno-js
  */
 export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry> {
   private readonly _configService: IConfigurationService

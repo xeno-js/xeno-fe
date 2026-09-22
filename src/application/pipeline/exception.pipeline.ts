@@ -1,4 +1,3 @@
-
 import type { Delegate, IRequest, ResultType } from '@xeno-js/shared'
 import { AppError, ERROR_CODE_MESSAGES, ERROR_CODES, Result, STATUS_CODES } from '@xeno-js/shared'
 
@@ -12,23 +11,26 @@ import type { IPipeline } from '@/domain'
  * @author Xeno
  * @version 1.0.0
  * @since 2025-09-30
- * @link https://github.com/Mattia-Carcione/xeno-js
+ * @link https://github.com/xeno-js/xeno-js
  */
 export class ExceptionPipeline implements IPipeline {
-    public async handle<TResult>(request: IRequest<TResult>, next: Delegate<TResult>): Promise<ResultType<TResult>> {
-        try {
-            return await next()
-        } catch (error: unknown) {
-            if (error instanceof AppError) return Result.fail(error)
+  public async handle<TResult>(
+    request: IRequest<TResult>,
+    next: Delegate<TResult>,
+  ): Promise<ResultType<TResult>> {
+    try {
+      return await next()
+    } catch (error: unknown) {
+      if (error instanceof AppError) return Result.fail(error)
 
-            const appError = AppError.create({
-                code: ERROR_CODES.SYSTEM_ERROR,
-                message: ERROR_CODE_MESSAGES[ERROR_CODES.SYSTEM_ERROR],
-                status: STATUS_CODES.INTERNAL_SERVER_ERROR,
-                name: request.intent,
-                cause: error,
-            })
-            return Result.fail(appError)
-        }
+      const appError = AppError.create({
+        code: ERROR_CODES.SYSTEM_ERROR,
+        message: ERROR_CODE_MESSAGES[ERROR_CODES.SYSTEM_ERROR],
+        status: STATUS_CODES.INTERNAL_SERVER_ERROR,
+        name: request.intent,
+        cause: error,
+      })
+      return Result.fail(appError)
     }
+  }
 }

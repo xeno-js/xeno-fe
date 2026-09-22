@@ -13,10 +13,10 @@ import type { IPipeline } from '@/domain'
    * @author Xeno
    * @version 1.0.0
    * @since 2025-09-30
-   * @link https://github.com/Mattia-Carcione/xeno-js 
+   * @link https://github.com/xeno-js/xeno-js 
    */
 export class LoggingPipeline implements IPipeline {
-    /**
+  /**
      * @description Constructs a new instance of the LoggingPipeline class, which requires an ILogger for logging. The pipeline will use this dependency to log relevant information about each request being handled, including any errors that occur during processing.
      * @param _logger An instance of ILogger used for logging informational messages and errors related to the handling of requests.
     
@@ -24,30 +24,30 @@ export class LoggingPipeline implements IPipeline {
      * @author Xeno
      * @version 1.0.0
      * @since 2025-09-30
-     * @link https://github.com/Mattia-Carcione/xeno-js 
+     * @link https://github.com/xeno-js/xeno-js 
      */
-    constructor(private readonly _logger: ILogger) { }
+  constructor(private readonly _logger: ILogger) {}
 
-    public async handle<TResult>(request: IRequest<TResult>, next: Delegate<TResult>): Promise<ResultType<TResult>> {
-        this._logger.info(`Handling ${request.type} ${request.intent}`)
+  public async handle<TResult>(
+    request: IRequest<TResult>,
+    next: Delegate<TResult>,
+  ): Promise<ResultType<TResult>> {
+    this._logger.info(`Handling ${request.type} ${request.intent}`)
 
-        try {
-            const result = await next()
+    try {
+      const result = await next()
 
-            if (!result.isOk()) {
-                const error = result.getErrorOrThrow()
-                this._logger.error(
-                    `Failed to handle ${request.intent}: ${error.message}`,
-                    error,
-                )
-            } else {
-                this._logger.info(`Successfully handled ${request.intent}`)
-            }
+      if (!result.isOk()) {
+        const error = result.getErrorOrThrow()
+        this._logger.error(`Failed to handle ${request.intent}: ${error.message}`, error)
+      } else {
+        this._logger.info(`Successfully handled ${request.intent}`)
+      }
 
-            return result
-        } catch (error: unknown) {
-            this._logger.error(`Exception while handling ${request.intent}`, error)
-            throw error
-        }
+      return result
+    } catch (error: unknown) {
+      this._logger.error(`Exception while handling ${request.intent}`, error)
+      throw error
     }
+  }
 }

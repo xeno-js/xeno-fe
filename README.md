@@ -6,10 +6,10 @@
   <p><em>Enterprise-grade DDD & CQRS framework for Vue.js</em></p>
 
   <p>
-    <a href="https://github.com/Mattia-Carcione/xeno-js">
+    <a href="https://github.com/xeno-js/xeno-js">
       <img src="https://img.shields.io/badge/Powered%20by-Xeno-blueviolet?style=flat-square" alt="Powered by Xeno" />
     </a>
-    <a href="https://github.com/Mattia-Carcione/xeno-fe/blob/main/LICENSE">
+    <a href="https://github.com/xeno-js/xeno-fe/blob/main/LICENSE">
       <img src="https://img.shields.io/npm/l/@xeno-js/vue?style=flat-square" alt="License: ISC" />
     </a>
     <a href="https://www.npmjs.com/package/@xeno-js/vue">
@@ -356,7 +356,7 @@ your README:
 
 ```html
 <a
-  href="[https://github.com/Mattia-Carcione/xeno-fe](https://github.com/Mattia-Carcione/xeno-fe)"
+  href="[https://github.com/xeno-js/xeno-fe](https://github.com/xeno-js/xeno-fe)"
   target="_blank"
 >
   <img

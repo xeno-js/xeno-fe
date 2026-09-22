@@ -8,7 +8,7 @@ import { Guards, LOG_LEVEL } from '@xeno-js/shared'
    * @author Xeno
    * @version 1.0.0
    * @since 2025-09-30
-   * @link https://github.com/Mattia-Carcione/xeno-js 
+   * @link https://github.com/xeno-js/xeno-js 
    */
 export class ConsoleLogger implements ILoggerClient {
   /**
@@ -19,7 +19,7 @@ export class ConsoleLogger implements ILoggerClient {
    * @author Xeno
    * @version 1.0.0
    * @since 2025-09-30
-   * @link https://github.com/Mattia-Carcione/xeno-js 
+   * @link https://github.com/xeno-js/xeno-js 
    */
   constructor(private readonly _minLevel: LogLevel = LOG_LEVEL.DEBUG) {}
 
