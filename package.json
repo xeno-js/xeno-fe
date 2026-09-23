@@ -1,6 +1,6 @@
 {
   "name": "@xeno-js/vue",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Xeno fontend npm package for vue",
   "repository": {
     "type": "git",
