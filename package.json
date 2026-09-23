@@ -1,6 +1,6 @@
 {
   "name": "@xeno-js/vue",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Xeno fontend npm package for vue",
   "repository": {
     "type": "git",
@@ -65,12 +65,12 @@
     "node": ">=20.0.0"
   },
   "peerDependencies": {
-    "@sentry/vue": "^10.73.0",
-    "@supabase/supabase-js": "^2.112.4",
-    "@xeno-js/shared": "^0.1.2",
-    "vue": "^3.5.41",
+    "@sentry/vue": "^10.75.2",
+    "@supabase/supabase-js": "^2.117.1",
+    "@xeno-js/shared": "^0.1.4",
+    "vue": "^3.5.43",
     "vue-router": "^4.6.4",
-    "zod": "^4.4.3"
+    "zod": "^4.6.5"
   },
   "peerDependenciesMeta": {
     "@sentry/vue": {
@@ -93,31 +93,31 @@
     }
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.0.1",
-    "@commitlint/config-conventional": "^21.0.1",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
     "@eslint/js": "^10.0.1",
-    "@sentry/vue": "^10.73.0",
-    "@supabase/supabase-js": "^2.116.0",
-    "@types/pg": "^8.20.0",
+    "@sentry/vue": "^10.75.2",
+    "@supabase/supabase-js": "^2.117.1",
+    "@types/pg": "^8.23.1",
     "@vercel/analytics": "^2.0.1",
-    "@vitest/coverage-v8": "^4.1.7",
-    "@xeno-js/shared": "^0.1.2",
+    "@vitest/coverage-v8": "^5.0.1",
+    "@xeno-js/shared": "^0.1.4",
     "aos": "^2.3.4",
     "axios": "^1.20.0",
-    "eslint": "^10.4.0",
+    "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-simple-import-sort": "^13.0.0",
+    "eslint-plugin-simple-import-sort": "^14.0.0",
     "husky": "^9.1.7",
-    "lint-staged": "^17.0.5",
-    "prettier": "^3.8.3",
-    "tsc-alias": "^1.9.2",
+    "lint-staged": "^17.5.1",
+    "prettier": "^3.9.9",
+    "tsc-alias": "^1.9.5",
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.0",
-    "vitest": "^4.1.7",
-    "vue": "^3.5.41",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.70.1",
+    "vitest": "^5.0.1",
+    "vue": "^3.5.43",
     "vue-router": "^4.6.4",
     "vue-tsc": "^3.3.11",
-    "zod": "^4.4.3"
+    "zod": "^4.6.5"
   }
 }
