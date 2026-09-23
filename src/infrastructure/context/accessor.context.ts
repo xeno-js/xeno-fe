@@ -44,6 +44,7 @@ export class RequestContextAccessor
           res: '',
         },
         csrf: '',
+        csrfCookie: '',
         origin: window.location.origin,
       },
       tracing: {
