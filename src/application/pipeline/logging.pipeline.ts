@@ -6,15 +6,11 @@ import type { IPipeline } from '@/domain'
  * @description A pipeline behavior that logs the handling of commands and queries, including their success or failure, along with contextual information such as request ID, correlation ID, and user ID.
  * This pipeline can be used to enhance observability and debugging capabilities in the application by providing detailed logs for each request processed through the CQRS pipeline.
  *
- * @template TInput - The type of the input request, which must extend the IRequest interface.
- * @template TResult - The type of the result returned by the request handler.
-
-   * 
-   * @author Xeno
-   * @version 1.0.0
-   * @since 2025-09-30
-   * @link https://github.com/xeno-js/xeno-js 
-   */
+ * @author Xeno
+ * @version 1.0.0
+ * @since 2025-09-30
+ * @link https://github.com/xeno-js/xeno-js
+ */
 export class LoggingPipeline implements IPipeline {
   /**
      * @description Constructs a new instance of the LoggingPipeline class, which requires an ILogger for logging. The pipeline will use this dependency to log relevant information about each request being handled, including any errors that occur during processing.

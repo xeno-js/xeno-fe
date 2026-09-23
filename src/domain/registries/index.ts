@@ -1,1 +1,1 @@
-export type * from './xeno-vue.registry'
+export type * from './xeno-vue-registry.contracts'
