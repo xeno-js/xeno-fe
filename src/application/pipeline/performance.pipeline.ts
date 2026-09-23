@@ -17,15 +17,11 @@ const defaultThresholdMs = 500
 /**
  * @description A pipeline behavior that measures the execution time of commands and queries, logging a warning if the execution time exceeds a specified threshold. This pipeline can be used to identify performance bottlenecks in the application and ensure that requests are processed within acceptable time limits.
  *
- * @template TInput - The type of the input request, which must extend the IRequest interface.
- * @template TResult - The type of the result returned by the request handler.
-
-   * 
-   * @author Xeno
-   * @version 1.0.0
-   * @since 2025-09-30
-   * @link https://github.com/xeno-js/xeno-js 
-   */
+ * @author Xeno
+ * @version 1.0.0
+ * @since 2025-09-30
+ * @link https://github.com/xeno-js/xeno-js
+ */
 export class PerformancePipeline implements IPipeline {
   /**
      * @description Threshold in milliseconds for logging performance warnings. If a request takes longer than this threshold to execute, a warning will be logged. This value is set through the constructor and must be a positive integer.
