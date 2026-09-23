@@ -15,6 +15,14 @@ import type {
   PipelineConfig,
 } from '../modules'
 
+/**
+ * @description Injection key for accessing the XenoVueRegistry instance.
+ * @type {InjectionKey<XenoVueRegistry>}
+ * @author Xeno
+ * @version 1.0.0
+ * @since 2025-09-30
+ * @link https://github.com/xeno-js/xeno-fe
+ */
 export const XENO_SERVICES_KEY: InjectionKey<XenoVueRegistry> = Symbol('XENO_SERVICES')
 
 /**
@@ -24,7 +32,7 @@ export const XENO_SERVICES_KEY: InjectionKey<XenoVueRegistry> = Symbol('XENO_SER
  * @author Xeno
  * @version 1.0.0
  * @since 2025-09-30
- * @link https://github.com/xeno-js/xeno-js
+ * @link https://github.com/xeno-js/xeno-fe
  */
 export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry> {
   private readonly _configService: IConfigurationService
@@ -73,6 +81,11 @@ export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry>
     })
   }
 
+  /**
+   * @description Configures the cache module with fluent callback.
+   * @param setup - A callback function that takes the cache configuration and the configuration service as arguments.
+   * @returns The current instance of the XenoBuilder.
+   */
   public addCache(setup: SetupAction<CacheConfig, IConfigurationService>): this {
     setup(this._configCache, this._configService)
 
@@ -80,6 +93,11 @@ export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry>
     return this
   }
 
+  /**
+   * @description Configures the pipeline module with fluent callback.
+   * @param setup - A callback function that takes the pipeline configuration and the configuration service as arguments.
+   * @returns The current instance of the XenoBuilder.
+   */
   public addPipeline(setup: SetupAction<PipelineConfig, IConfigurationService>): this {
     if (this._isPipelineConfigured) return this
 
@@ -103,7 +121,7 @@ export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry>
   }
 
   /**
-   * Configures the logging module with fluent callback.
+   * @description Configures the logging module with fluent callback.
    * Defers dynamic import of LoggerModule until build() execution.
    */
   public addLogger(setup: SetupAction<LoggerConfig, IConfigurationService>): this {
@@ -113,6 +131,10 @@ export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry>
     return this
   }
 
+  /**
+   * @description Configures the context module with fluent callback.
+   * Defers dynamic import of ContextModule until build() execution.
+   */
   public addContext(setup: SetupAction<ContextConfig, IConfigurationService>): this {
     if (this._isContextConfigured) return this
 
@@ -128,6 +150,11 @@ export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry>
     return this
   }
 
+  /**
+   * @description Configures the authentication module with fluent callback.
+   * Defers dynamic import of AuthModule until build() execution.
+   * @param setup A callback function that configures the authentication module
+   */
   public addAuth(
     setup: SetupAction<AuthConfig<SupabaseClientOptions<'public'>>, IConfigurationService>,
   ): this {
@@ -190,6 +217,7 @@ export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry>
    * @description Permette la registrazione massiva di più servizi in un unico blocco,
    * garantendo la type-safety tramite il parametro `register` iniettato.
    * @param setup Callback per orchestrare le registrazioni.
+   * @returns L'istanza di XenoAppBuilder per la costruzione successiva.
    */
   public addServices(
     setup: (
@@ -209,12 +237,21 @@ export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry>
     return this
   }
 
+  /**
+   * @description Creates a new instance of the XenoBuilder class with the provided configuration service.
+   * @param configService - The configuration service to use for the builder.
+   * @returns A new instance of the XenoBuilder class.
+   */
   public static create<T extends XenoVueRegistry = XenoVueRegistry>(
     configService?: IConfigurationService,
   ): XenoAppBuilder<T> {
     return new XenoAppBuilder<T>(configService)
   }
 
+  /**
+   * @description Builds the application by executing all the registered tasks and returning the resulting services.
+   * @returns A promise that resolves to the resulting services.
+   */
   public async build(): Promise<TRegistry> {
     try {
       const services: Partial<TRegistry> = {}

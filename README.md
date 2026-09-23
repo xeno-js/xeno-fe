@@ -77,16 +77,6 @@ composables.
 
 ---
 
-## 🚀 Live Executable Demos
-
-Want to see how Xeno Vue works? Check out the functional example application
-showcasing end-to-end command/query segregation, resilient HTTP fetching, and
-pure Composition API integration.
-
-- **[Xeno Vue Demo Architecture](https://www.xeno-js.it/demo)**
-
----
-
 ## 📦 Installation
 
 Install the Vue package:
@@ -143,9 +133,7 @@ const builder = XenoAppBuilder.create<MyRegistry>()
       baseURL: config.getOrThrow('VITE_API_BASE_URL'),
       timeoutMs: 10000,
     }
-    opts.resilience.retry.attempts = 3
-    opts.factory = (http, resilience) =>
-      new BffRemoteDataSource(http, resilience)
+    opts.factory = (http) => new BffRemoteDataSource(http)
   })
   .addPipeline((config) => {
     config.queryCaching = true // Enable in-memory caching for Queries
@@ -203,7 +191,7 @@ export function useCreateUser() {
 
     try {
       // Safely resolve the Mediator from the Xeno Container
-      const { mediator, BFF_REMOTE_DS } = ServicesUtils.useApp()
+      const { mediator, BFF_REMOTE_DS: bffRemoteDs } = ServicesUtils.useApp()
       const command = new CreateUserCommand()
 
       const result = await mediator.send(command, async () => {
@@ -245,9 +233,8 @@ npx @xeno-js/cli g command CreateUser --vue
 
 ```
 
-Check the
-**[CLI Documentation](https://www.google.com/search?q=https://www.xeno-js.it/cli/overview&utm_source=gemini)**
-for full options.
+Check the **[CLI Documentation](https://www.xeno-js.it/cli/overview)** for full
+options.
 
 ---
 
