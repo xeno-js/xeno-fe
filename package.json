@@ -67,7 +67,7 @@
   "peerDependencies": {
     "@sentry/vue": "^10.75.2",
     "@supabase/supabase-js": "^2.117.1",
-    "@xeno-js/shared": "^0.1.4",
+    "@xeno-js/shared": "^0.1.6",
     "vue": "^3.5.43",
     "vue-router": "^4.6.4",
     "zod": "^4.6.5"
@@ -101,7 +101,7 @@
     "@types/pg": "^8.23.1",
     "@vercel/analytics": "^2.0.1",
     "@vitest/coverage-v8": "^5.0.1",
-    "@xeno-js/shared": "^0.1.4",
+    "@xeno-js/shared": "^0.1.6",
     "aos": "^2.3.4",
     "axios": "^1.20.0",
     "eslint": "^10.11.0",
