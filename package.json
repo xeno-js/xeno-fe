@@ -1,7 +1,7 @@
 {
   "name": "@xeno-js/vue",
   "version": "0.1.5",
-  "description": "Xeno fontend npm package for vue",
+  "description": "Xeno Vue frontend package — enterprise DDD, CQRS, and Clean Architecture for the browser",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xeno-js/xeno-fe.git"
@@ -43,20 +43,22 @@
     "verify:commit": "npm run lint-staged && npm run test",
     "verify:push": "npm run check",
     "prepare": "husky",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "prepublishOnly": "npm run check && npm run build",
-    "release": "npm run prepublishOnly && npm publish"
+    "release:patch": "npm version patch && npm run changelog && npm run prepublishOnly && npm publish --access public",
+    "release:minor": "npm version minor && npm run changelog && npm run prepublishOnly && npm publish --access public",
+    "release:major": "npm version major && npm run changelog && npm run prepublishOnly && npm publish --access public"
   },
   "keywords": [
-    "ddd",
+    "vue",
+    "vuejs",
+    "frontend",
     "clean-architecture",
-    "core",
-    "kernel",
-    "domain-driven-design",
-    "mediator",
-    "event-sourcing",
+    "ddd",
     "cqrs",
-    "repository-pattern",
-    "supabase",
+    "mediator",
+    "dependency-injection",
+    "composable",
     "zod"
   ],
   "author": "Xeno",
@@ -108,6 +110,7 @@
     "@xeno-js/shared": "^0.1.6",
     "aos": "^2.3.4",
     "axios": "^1.20.0",
+    "conventional-changelog-cli": "^5.0.0",
     "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-simple-import-sort": "^14.0.0",
