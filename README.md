@@ -53,10 +53,6 @@ boundaries.
   Layer. Business logic, API calls, and CQRS handlers live in pure, isolated
   TypeScript classes. You can swap Vue for React tomorrow without touching your
   core domain.
-- **Enterprise-Grade Client Resiliency**: The browser is a hostile, unreliable
-  environment. Xeno Vue natively integrates `Cockatiel` and `Axios` to provide
-  out-of-the-box circuit breakers, retries with jitter, and bulkheads directly
-  in the client.
 - **Frontend Middleware Pipeline**: Handle Authentication, CSRF validation,
   aggressive Query Caching, and Performance logging _before_ a command is
   executed or an API call fires, using the native `Mediator` pipeline.
@@ -91,7 +87,7 @@ libraries you actually need.
 
 ```bash
 # Example: Install tools only if you enable them in the builder
-npm install axios cockatiel zod @supabase/supabase-js @sentry/vue
+npm install axios zod @supabase/supabase-js @sentry/vue
 
 ```
 
