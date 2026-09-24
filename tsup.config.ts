@@ -22,6 +22,7 @@ export default defineConfig({
     '@sentry/vue',
     '@supabase/supabase-js',
     '@xeno-js/shared',
+    'axios',
     'vue',
     'vue-router',
     'zod',

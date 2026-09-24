@@ -1,6 +1,6 @@
 {
   "name": "@xeno-js/vue",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "description": "Xeno fontend npm package for vue",
   "repository": {
     "type": "git",
@@ -68,6 +68,7 @@
     "@sentry/vue": "^10.75.2",
     "@supabase/supabase-js": "^2.117.1",
     "@xeno-js/shared": "^0.1.6",
+    "axios": "^1.20.0",
     "vue": "^3.5.43",
     "vue-router": "^4.6.4",
     "zod": "^4.6.5"
@@ -80,6 +81,9 @@
       "optional": true
     },
     "@xeno-js/shared": {
+      "optional": false
+    },
+    "axios": {
       "optional": false
     },
     "vue": {

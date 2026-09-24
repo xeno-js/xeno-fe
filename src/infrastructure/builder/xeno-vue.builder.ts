@@ -201,7 +201,7 @@ export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry>
     }
 
     this._tasks.push(async (services) => {
-      const { AxiosFactory } = await import('@xeno-js/shared')
+      const { AxiosFactory } = await import('../factories')
 
       const httpClient = new AxiosFactory().create(config.client)
 
