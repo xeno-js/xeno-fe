@@ -5,10 +5,10 @@ import type { ILoggerClient, LogLevel, Optional } from '@xeno-js/shared'
 import { Guards, LOG_LEVEL } from '@xeno-js/shared'
 
 const SENTRY_LEVEL_MAP: Record<LogLevel, SeverityLevel> = Object.freeze({
-    [LOG_LEVEL.DEBUG]: 'debug',
-    [LOG_LEVEL.INFO]: 'info',
-    [LOG_LEVEL.WARN]: 'warning',
-    [LOG_LEVEL.ERROR]: 'error',
+  [LOG_LEVEL.DEBUG]: 'debug',
+  [LOG_LEVEL.INFO]: 'info',
+  [LOG_LEVEL.WARN]: 'warning',
+  [LOG_LEVEL.ERROR]: 'error',
 })
 
 /**
@@ -19,45 +19,44 @@ const SENTRY_LEVEL_MAP: Record<LogLevel, SeverityLevel> = Object.freeze({
  * @author Xeno
  * @version 1.0.0
  * @since 2025-09-30
- * @link https://github.com/Mattia-Carcione/xeno-js
+ * @link https://github.com/xeno-js/xeno-js
  */
 export class SentryLogger implements ILoggerClient {
-    /**
-     * @description Constructs a new instance of SentryLogger.
-     * @param _client The injected Sentry client instance.
-     * @param _minLevel The minimum log level threshold. Messages below this level are ignored. Default is LOG_LEVEL.WARN.
-     *
-     * @author Xeno
-     * @version 1.0.0
-     * @since 2025-09-30
-     * @link https://github.com/Mattia-Carcione/xeno-js
-     */
-    constructor(
-        private readonly _client: typeof Sentry,
-        private readonly _minLevel: LogLevel = LOG_LEVEL.WARN,
-    ) { }
+  /**
+   * @description Constructs a new instance of SentryLogger.
+   * @param _client The injected Sentry client instance.
+   * @param _minLevel The minimum log level threshold. Messages below this level are ignored. Default is LOG_LEVEL.WARN.
+   *
+   * @author Xeno
+   * @version 1.0.0
+   * @since 2025-09-30
+   * @link https://github.com/xeno-js/xeno-js
+   */
+  constructor(
+    private readonly _client: typeof Sentry,
+    private readonly _minLevel: LogLevel = LOG_LEVEL.WARN,
+  ) {}
 
-    public track<T>(
-        level: LogLevel,
-        message: string,
-        context: Optional<T> = undefined,
-        error: Optional<unknown> = undefined,
-    ): void {
-        if (level < this._minLevel) return
+  public track<T>(
+    level: LogLevel,
+    message: string,
+    context: Optional<T> = undefined,
+    error: Optional<unknown> = undefined,
+  ): void {
+    if (level < this._minLevel) return
 
-        const sentryLevel = SENTRY_LEVEL_MAP[level] ?? 'info'
+    const sentryLevel = SENTRY_LEVEL_MAP[level] ?? 'info'
 
-        this._client.withScope((scope) => {
-            scope.setLevel(sentryLevel)
+    this._client.withScope((scope) => {
+      scope.setLevel(sentryLevel)
 
-            if (Guards.isDefined(context) && Guards.isObject(context))
-                scope.setExtras(context as Record<string, unknown>)
+      if (Guards.isDefined(context) && Guards.isObject(context))
+        scope.setExtras(context as Record<string, unknown>)
 
-            if (Guards.isDefined(error)) {
-                scope.setExtra('log_message', message)
-                this._client.captureException(error)
-            } else
-                this._client.captureMessage(message, sentryLevel)
-        })
-    }
+      if (Guards.isDefined(error)) {
+        scope.setExtra('log_message', message)
+        this._client.captureException(error)
+      } else this._client.captureMessage(message, sentryLevel)
+    })
+  }
 }

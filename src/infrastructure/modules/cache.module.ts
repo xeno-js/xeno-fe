@@ -3,8 +3,8 @@ import type { ICache, ICacheKeyBuilder, IIdentityAccessor, Optional } from '@xen
 import type { CacheConfig } from './config/cache.config'
 
 interface CacheResponse {
-    cache: Optional<ICache>;
-    cacheKeyBuilder: ICacheKeyBuilder
+  cache: Optional<ICache>
+  cacheKeyBuilder: ICacheKeyBuilder
 }
 
 /**
@@ -15,32 +15,35 @@ interface CacheResponse {
  * @author Xeno
  * @version 1.0.0
  * @since 2025-09-30
- * @link https://github.com/Mattia-Carcione/xeno-js
+ * @link https://github.com/xeno-js/xeno-js
  */
 export class CacheModule {
-    /**
-     * Assembles cache clients on-demand and returns a fully initialized Cache and CacheKeyBuilder instance.
-     *
-     * @param config The module configuration.
-     * @returns Configured cache and cache key builder instance.
-     */
-    public static async create(config: CacheConfig, ctx: Optional<IIdentityAccessor>): Promise<CacheResponse> {
-        const { RequestContextAccessor } = await import('../context')
-        const contexAccessor = ctx ?? new RequestContextAccessor()
+  /**
+   * Assembles cache clients on-demand and returns a fully initialized Cache and CacheKeyBuilder instance.
+   *
+   * @param config The module configuration.
+   * @returns Configured cache and cache key builder instance.
+   */
+  public static async create(
+    config: CacheConfig,
+    ctx: Optional<IIdentityAccessor>,
+  ): Promise<CacheResponse> {
+    const { RequestContextAccessor } = await import('../context')
+    const contexAccessor = ctx ?? new RequestContextAccessor()
 
-        const { CacheKeyBuilder } = await import('@xeno-js/shared')
-        const cacheKeyBuilder = new CacheKeyBuilder(contexAccessor)
+    const { CacheKeyBuilder } = await import('@xeno-js/shared')
+    const cacheKeyBuilder = new CacheKeyBuilder(contexAccessor)
 
-        const response: CacheResponse = {
-            cache: undefined,
-            cacheKeyBuilder
-        }
-
-        if (config.inMemory) {
-            const { InMemoryCache } = await import('@xeno-js/shared')
-            response.cache = new InMemoryCache()
-        }
-
-        return response
+    const response: CacheResponse = {
+      cache: undefined,
+      cacheKeyBuilder,
     }
+
+    if (config.inMemory) {
+      const { InMemoryCache } = await import('@xeno-js/shared')
+      response.cache = new InMemoryCache()
+    }
+
+    return response
+  }
 }

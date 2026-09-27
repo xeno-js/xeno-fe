@@ -13,35 +13,35 @@ import type { SentryConfig } from '../modules'
  * @author Xeno
  * @version 1.0.0
  * @since 2025-09-30
- * @link https://github.com/Mattia-Carcione/xeno-js
+ * @link https://github.com/xeno-js/xeno-js
  */
 export class SentryLoggerFactory implements IFactory<SentryConfig, ILoggerClient> {
-    /**
-     * @description Initializes the Sentry Vue SDK with the provided options and returns an ILoggerClient.
-     * @param config The Sentry configuration settings.
-     * @returns An initialized ILoggerClient adapter.
-     */
-    public create(config: SentryConfig): ILoggerClient {
-        const minLevel: LogLevel = config.level ?? LOG_LEVEL.WARN
+  /**
+   * @description Initializes the Sentry Vue SDK with the provided options and returns an ILoggerClient.
+   * @param config The Sentry configuration settings.
+   * @returns An initialized ILoggerClient adapter.
+   */
+  public create(config: SentryConfig): ILoggerClient {
+    const minLevel: LogLevel = config.level ?? LOG_LEVEL.WARN
 
-        const integrations = [
-            Guards.isDefined(config.router)
-                ? Sentry.browserTracingIntegration({ router: config.router })
-                : Sentry.browserTracingIntegration(),
-            Sentry.replayIntegration(),
-        ]
+    const integrations = [
+      Guards.isDefined(config.router)
+        ? Sentry.browserTracingIntegration({ router: config.router })
+        : Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration(),
+    ]
 
-        Sentry.init({
-            app: config.app,
-            dsn: config.dsn,
-            environment: config.env,
-            release: config.release ?? undefined,
-            integrations,
-            tracesSampleRate: config.tracesSampleRate ?? 0.2,
-            replaysSessionSampleRate: config.replaysSessionSampleRate ?? 0.1,
-            replaysOnErrorSampleRate: config.replaysOnErrorSampleRate ?? 1.0,
-        })
+    Sentry.init({
+      app: config.app,
+      dsn: config.dsn,
+      environment: config.env,
+      release: config.release ?? undefined,
+      integrations,
+      tracesSampleRate: config.tracesSampleRate ?? 0.2,
+      replaysSessionSampleRate: config.replaysSessionSampleRate ?? 0.1,
+      replaysOnErrorSampleRate: config.replaysOnErrorSampleRate ?? 1.0,
+    })
 
-        return new SentryLogger(Sentry, minLevel)
-    }
+    return new SentryLogger(Sentry, minLevel)
+  }
 }

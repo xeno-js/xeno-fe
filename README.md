@@ -6,10 +6,10 @@
   <p><em>Enterprise-grade DDD & CQRS framework for Vue.js</em></p>
 
   <p>
-    <a href="https://github.com/Mattia-Carcione/xeno-js">
+    <a href="https://github.com/xeno-js/xeno-js">
       <img src="https://img.shields.io/badge/Powered%20by-Xeno-blueviolet?style=flat-square" alt="Powered by Xeno" />
     </a>
-    <a href="https://github.com/Mattia-Carcione/xeno-fe/blob/main/LICENSE">
+    <a href="https://github.com/xeno-js/xeno-fe/blob/main/LICENSE">
       <img src="https://img.shields.io/npm/l/@xeno-js/vue?style=flat-square" alt="License: ISC" />
     </a>
     <a href="https://www.npmjs.com/package/@xeno-js/vue">
@@ -53,10 +53,6 @@ boundaries.
   Layer. Business logic, API calls, and CQRS handlers live in pure, isolated
   TypeScript classes. You can swap Vue for React tomorrow without touching your
   core domain.
-- **Enterprise-Grade Client Resiliency**: The browser is a hostile, unreliable
-  environment. Xeno Vue natively integrates `Cockatiel` and `Axios` to provide
-  out-of-the-box circuit breakers, retries with jitter, and bulkheads directly
-  in the client.
 - **Frontend Middleware Pipeline**: Handle Authentication, CSRF validation,
   aggressive Query Caching, and Performance logging _before_ a command is
   executed or an API call fires, using the native `Mediator` pipeline.
@@ -77,16 +73,6 @@ composables.
 
 ---
 
-## 🚀 Live Executable Demos
-
-Want to see how Xeno Vue works? Check out the functional example application
-showcasing end-to-end command/query segregation, resilient HTTP fetching, and
-pure Composition API integration.
-
-- **[Xeno Vue Demo Architecture](https://www.xeno-js.it/demo)**
-
----
-
 ## 📦 Installation
 
 Install the Vue package:
@@ -101,7 +87,7 @@ libraries you actually need.
 
 ```bash
 # Example: Install tools only if you enable them in the builder
-npm install axios cockatiel zod @supabase/supabase-js @sentry/vue
+npm install axios zod @supabase/supabase-js @sentry/vue
 
 ```
 
@@ -143,9 +129,7 @@ const builder = XenoAppBuilder.create<MyRegistry>()
       baseURL: config.getOrThrow('VITE_API_BASE_URL'),
       timeoutMs: 10000,
     }
-    opts.resilience.retry.attempts = 3
-    opts.factory = (http, resilience) =>
-      new BffRemoteDataSource(http, resilience)
+    opts.factory = (http) => new BffRemoteDataSource(http)
   })
   .addPipeline((config) => {
     config.queryCaching = true // Enable in-memory caching for Queries
@@ -203,7 +187,7 @@ export function useCreateUser() {
 
     try {
       // Safely resolve the Mediator from the Xeno Container
-      const { mediator, BFF_REMOTE_DS } = ServicesUtils.useApp()
+      const { mediator, BFF_REMOTE_DS: bffRemoteDs } = ServicesUtils.useApp()
       const command = new CreateUserCommand()
 
       const result = await mediator.send(command, async () => {
@@ -245,9 +229,8 @@ npx @xeno-js/cli g command CreateUser --vue
 
 ```
 
-Check the
-**[CLI Documentation](https://www.google.com/search?q=https://www.xeno-js.it/cli/overview&utm_source=gemini)**
-for full options.
+Check the **[CLI Documentation](https://www.xeno-js.it/cli/overview)** for full
+options.
 
 ---
 
@@ -356,7 +339,7 @@ your README:
 
 ```html
 <a
-  href="[https://github.com/Mattia-Carcione/xeno-fe](https://github.com/Mattia-Carcione/xeno-fe)"
+  href="[https://github.com/xeno-js/xeno-fe](https://github.com/xeno-js/xeno-fe)"
   target="_blank"
 >
   <img

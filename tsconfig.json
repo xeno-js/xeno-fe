@@ -16,8 +16,7 @@
     "emitDecoratorMetadata": true,
     "verbatimModuleSyntax": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "zod": ["./node_modules/zod"]
+      "@/*": ["./src/*"]
     },
     "tsBuildInfoFile": "bundler",
     "types": ["vite/client"]
