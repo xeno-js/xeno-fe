@@ -1,7 +1,7 @@
 {
   "name": "@xeno-js/vue",
   "version": "0.1.5",
-  "description": "Xeno Vue frontend package — enterprise DDD, CQRS, and Clean Architecture for the browser",
+  "description": "Application architecture for Vue with explicit dependency injection, CQRS, composable pipelines, and clear application boundaries.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xeno-js/xeno-fe.git"
@@ -62,14 +62,14 @@
     "zod"
   ],
   "author": "Xeno",
-  "license": "ISC",
+  "license": "MIT",
   "engines": {
     "node": ">=20.0.0"
   },
   "peerDependencies": {
     "@sentry/vue": "^10.75.2",
     "@supabase/supabase-js": "^2.117.1",
-    "@xeno-js/shared": "^0.1.6",
+    "@xeno-js/shared": "^0.2.1",
     "axios": "^1.20.0",
     "vue": "^3.5.43",
     "vue-router": "^4.6.4",
@@ -107,7 +107,7 @@
     "@types/pg": "^8.23.1",
     "@vercel/analytics": "^2.0.1",
     "@vitest/coverage-v8": "^5.0.1",
-    "@xeno-js/shared": "^0.1.6",
+    "@xeno-js/shared": "^0.2.1",
     "aos": "^2.3.4",
     "axios": "^1.20.0",
     "conventional-changelog-cli": "^5.0.0",
