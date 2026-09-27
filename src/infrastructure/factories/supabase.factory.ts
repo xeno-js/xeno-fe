@@ -1,7 +1,7 @@
-// infrastructure/factories/supabase-frontend-auth.factory.ts
 import { SupabaseClient, type SupabaseClientOptions } from '@supabase/supabase-js'
-import type { AuthConfig, IExtendendService, IFactory } from '@xeno-js/shared'
+import type { AuthConfig, IExtendendAuthService, IFactory } from '@xeno-js/shared'
 import {
+  Guards,
   StorageHelper,
   SupabaseAuthService,
   SupabaseClaimsMapper,
@@ -10,9 +10,12 @@ import {
 
 export class SupabaseAuthFactory implements IFactory<
   AuthConfig<SupabaseClientOptions<'public'>>,
-  IExtendendService
+  IExtendendAuthService
 > {
-  public create(config: AuthConfig<SupabaseClientOptions<'public'>>): IExtendendService {
+  public create(config: AuthConfig<SupabaseClientOptions<'public'>>): IExtendendAuthService {
+    if (!Guards.isDefined(config.storageOpts))
+      throw new Error('[Xeno CLI Error]: Aborted. Please provide a storage option.')
+
     const client = new SupabaseClient(config.url, config.key, {
       auth: {
         ...config.opts,
