@@ -3,7 +3,7 @@ import type {
   ICacheKeyBuilder,
   IConfigurationService,
   IContextAccessor,
-  IExtendendService,
+  IExtendendAuthService,
   IIdentityAccessor,
   ILogger,
   RequestContext,
@@ -51,5 +51,5 @@ export type XenoVueRegistry<TExtensions = object> = {
   /**
    * @description The authentication service used to authenticate users.
    */
-  authService: IExtendendService
+  authService: IExtendendAuthService
 } & TExtensions
