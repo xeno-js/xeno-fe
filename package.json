@@ -86,7 +86,7 @@
       "optional": false
     },
     "axios": {
-      "optional": false
+      "optional": true
     },
     "vue": {
       "optional": false
