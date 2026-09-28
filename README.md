@@ -1,19 +1,25 @@
 <div align="center">
-  <img src="logo/logo.png" alt="Xeno Logo" width="140" />
+  <img src="logo/logo.png" alt="Xeno Vue Logo" width="140" />
 
   <h1>Xeno Vue</h1>
 
-  <p><em>Enterprise-grade DDD & CQRS framework for Vue.js</em></p>
+  <p><strong>Your UI framework handles the UI. Xeno handles the application.</strong></p>
 
   <p>
-    <a href="https://github.com/xeno-js/xeno-js">
-      <img src="https://img.shields.io/badge/Powered%20by-Xeno-blueviolet?style=flat-square" alt="Powered by Xeno" />
-    </a>
-    <a href="https://github.com/xeno-js/xeno-fe/blob/main/LICENSE">
-      <img src="https://img.shields.io/npm/l/@xeno-js/vue?style=flat-square" alt="License: ISC" />
-    </a>
+    Application architecture for Vue with explicit dependency injection,
+    CQRS, composable pipelines, and clear boundaries between presentation,
+    application behavior, and infrastructure.
+  </p>
+
+  <p>
     <a href="https://www.npmjs.com/package/@xeno-js/vue">
-      <img src="https://img.shields.io/npm/v/@xeno-js/vue?style=flat-square" alt="NPM Version" />
+      <img src="https://img.shields.io/npm/v/@xeno-js/vue?style=flat-square" alt="npm version" />
+    </a>
+    <a href="https://github.com/xeno-js/xeno-fe">
+      <img src="https://img.shields.io/github/stars/xeno-js/xeno-fe?style=flat-square" alt="GitHub stars" />
+    </a>
+    <a href="https://img.shields.io/npm/l/@xeno-js/vue?style=flat-square">
+      <img src="https://img.shields.io/npm/l/@xeno-js/vue?style=flat-square" alt="License: MIT" />
     </a>
     <a href="https://buymeacoffee.com/xenojs">
       <img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Support-FFdd00?style=flat-square&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee" />
@@ -25,332 +31,598 @@
 
 ## What is Xeno Vue?
 
-**Xeno Vue** (`@xeno-js/vue`) is an enterprise-grade, deterministic
-architectural framework that brings the strictness of **Domain-Driven Design
-(DDD)** and **Command Query Responsibility Segregation (CQRS)** natively to the
-browser.
+**Xeno Vue** (`@xeno-js/vue`) brings Xeno's application architecture to Vue
+applications.
 
-By shifting operational logic, remote data fetching, and state mutations away
-from Vue components and Pinia stores, Xeno ensures your frontend architecture
-remains pristine, highly testable, and completely decoupled from the UI layer.
-It treats the browser as a complex distributed client, not just a document
-viewer.
+It provides the composition root and application building blocks needed to keep
+application behavior explicit instead of putting all of it inside Vue
+components.
 
----
+The package is built around:
 
-## 💡 Why Choose Xeno Vue?
+- explicit dependency injection;
+- a typed application registry;
+- commands and queries through a client-side mediator;
+- composable application pipelines;
+- remote data source boundaries;
+- browser request and identity context;
+- optional authentication, logging, validation, and caching integrations.
 
-Modern frontend development often leads to "Spaghetti State" where API calls,
-business rules, and DOM manipulations are tightly coupled inside components.
-Xeno Vue fixes this with an emphasis on pure Dependency Injection (DI) and clean
-boundaries.
+The goal is simple:
 
-- **Zero-Magic Dependency Injection**: Xeno provides an explicit
-  `XenoAppBuilder` to construct your IoC container at bootstrap. No hidden Vue
-  plugins doing implicit injections. You have total control over the dependency
-  graph.
-- **Total UI Decoupling**: Vue components act strictly as the Presentation
-  Layer. Business logic, API calls, and CQRS handlers live in pure, isolated
-  TypeScript classes. You can swap Vue for React tomorrow without touching your
-  core domain.
-- **Frontend Middleware Pipeline**: Handle Authentication, CSRF validation,
-  aggressive Query Caching, and Performance logging _before_ a command is
-  executed or an API call fires, using the native `Mediator` pipeline.
+> **Keep Vue responsible for presentation. Keep application behavior explicit.**
 
 ---
 
-## 📖 Documentation & Getting Started
+## The boundary
 
-To explore the architecture, programmatic configurations, and extension
-workflows of Xeno Vue, read the full technical manuals located inside the main
-documentation hub:
+A Vue application does not need to put every concern into components, stores, or
+router handlers.
 
-- **[Framework Documentation Repository](https://www.xeno-js.it/vue/overview)**
+Xeno gives the application layer a distinct place to live:
 
-Inside, you will find exhaustive, step-by-step assembly guides covering frontend
-IoC building (`XenoAppBuilder`), Vue `Provide/Inject` boundaries, and CQRS
-composables.
-
----
-
-## 📦 Installation
-
-Install the Vue package:
-
-```bash
-npm install @xeno-js/vue
-
+```text
+Vue UI
+    ↓
+Application
+    ↓
+Domain / Shared
+    ↓
+Infrastructure
+    ↓
+HTTP / external systems
 ```
 
-Xeno uses **Optional Peer Dependencies**. You only install the external
-libraries you actually need.
+Vue remains your presentation layer.
 
-```bash
-# Example: Install tools only if you enable them in the builder
-npm install axios zod @supabase/supabase-js @sentry/vue
-
-```
+Xeno provides the application composition and execution model around it.
 
 ---
 
-## ⚡ Bootstrapping & Component Example
+## Why Xeno Vue?
 
-Below is an architectural example of how to configure the Xeno `XenoAppBuilder`,
-inject it into the Vue application, and consume it using Composition API
-Composables.
+As an application grows, API calls, validation, logging, caching,
+authentication, and application decisions can end up spread across components.
 
-### 1. Initialize the Container (`src/bootstrap.ts`)
+Xeno makes those responsibilities explicit.
 
-```typescript
-import { XenoAppBuilder, LOG_LEVEL, TOKENS } from '@xeno-js/vue'
-import { BffRemoteDataSource } from './infrastructure'
+### Explicit dependency injection
 
-import type { RemoteDataSource, XenoVueRegistry } from '@xeno-js/vue'
+`XenoAppBuilder` is the composition root.
 
-export type MyRegistry = XenoVueRegistry<{
-  BFF_REMOTE_DS: RemoteDataSource
-}>
+Dependencies are registered in code instead of being discovered through
+decorators, runtime scanning, or hidden framework conventions.
 
-// Create the root IoC container context for the browser
-const builder = XenoAppBuilder.create<MyRegistry>()
-  .addContext((opts) => {
-    opts.contextAccessor = useContextStore()
-  })
-  .addLogger((opts, config) => {
-    opts.console = config.get('VITE_APP_ENV') === 'development'
-    opts.level = LOG_LEVEL.DEBUG
-  })
-  .addAuth((opts, config) => {
-    opts.url = config.getOrThrow('VITE_SUPABASE_URL')
-    opts.key = config.getOrThrow('VITE_SUPABASE_KEY')
-  })
-  .addHttpCore('BFF_REMOTE_DS', (opts, config) => {
-    opts.client = {
-      baseURL: config.getOrThrow('VITE_API_BASE_URL'),
-      timeoutMs: 10000,
-    }
-    opts.factory = (http) => new BffRemoteDataSource(http)
-  })
-  .addPipeline((config) => {
-    config.queryCaching = true // Enable in-memory caching for Queries
-  })
+```ts
+import { XenoAppBuilder } from '@xeno-js/vue'
 
-export async function bootstrap() {
-  return await builder.build()
+const builder = XenoAppBuilder.create()
+```
+
+You configure the services your application needs through the builder.
+
+---
+
+### CQRS in the browser
+
+The client mediator exposes two execution paths:
+
+```text
+Command
+   ↓
+Command pipeline
+   ↓
+Application action
+
+Query
+   ↓
+Query pipeline
+   ↓
+Application action
+```
+
+Commands are sent with:
+
+```ts
+await services.mediator.send(command, action)
+```
+
+Queries are executed with:
+
+```ts
+await services.mediator.query(query, action)
+```
+
+The application action is supplied by your code, so the transport remains behind
+an infrastructure boundary.
+
+---
+
+## Pipelines
+
+Cross-cutting behavior belongs in the application execution pipeline.
+
+The current implementation provides pipeline building blocks for:
+
+- exception handling;
+- logging;
+- performance thresholds;
+- validation with Zod schemas;
+- query caching.
+
+Pipelines are composed by the application module and executed around commands
+and queries.
+
+For example:
+
+```ts
+builder.addPipeline((config) => {
+  config.queryCaching = true
+  config.threshold = 500
+})
+```
+
+Query caching uses the configured cache and is intended for query requests.
+
+---
+
+## Remote data sources
+
+HTTP concerns can be isolated behind a remote data source.
+
+```ts
+import { RemoteDataSource } from '@xeno-js/vue'
+
+export class UsersRemoteDataSource extends RemoteDataSource {
+  public getById(id: string) {
+    return this.get<User>(`/users/${id}`)
+  }
+
+  public create(payload: CreateUserPayload) {
+    return this.post<User, CreateUserPayload>('/users', payload)
+  }
 }
 ```
 
-### 2. Inject into Vue (`src/main.ts`)
+The data source depends on the framework-neutral HTTP client abstraction.
 
-```typescript
+`XenoAppBuilder.addHttpCore()` then provides the concrete HTTP client and
+registers the resulting data source in the application registry.
+
+```ts
+type AppRegistry = XenoVueRegistry<{
+  users: UsersRemoteDataSource
+}>
+
+const builder = XenoAppBuilder.create<AppRegistry>().addHttpCore(
+  'users',
+  (config) => {
+    config.client.baseURL = '/api'
+    config.factory = (http) => new UsersRemoteDataSource(http)
+  },
+)
+```
+
+Axios is used by the built-in HTTP adapter when `addHttpCore()` is configured.
+
+---
+
+## Application context
+
+Browser applications still need contextual information around the current
+execution.
+
+Xeno provides a browser context accessor containing information such as:
+
+- request ID;
+- correlation ID;
+- user identity;
+- user agent;
+- path;
+- origin;
+- transport metadata.
+
+You can use the default accessor or provide your own implementation.
+
+```ts
+builder.addContext((config) => {
+  // Optional custom context accessor configuration.
+})
+```
+
+---
+
+## Logging
+
+Logging is configured independently from the application code.
+
+The package currently supports:
+
+- console logging;
+- Sentry logging;
+- custom logger clients.
+
+Example:
+
+```ts
+builder.addLogger((config) => {
+  config.console = true
+})
+```
+
+Optional integrations are loaded when they are configured, keeping them outside
+the default bootstrap path.
+
+---
+
+## Authentication
+
+Supabase authentication is available as an infrastructure integration.
+
+```ts
+builder.addAuth((config, env) => {
+  config.url = env.getOrThrow('SUPABASE_URL')
+  config.key = env.getOrThrow('SUPABASE_KEY')
+})
+```
+
+The default configuration service resolves `VITE_` environment variables in Vite
+applications.
+
+For example:
+
+```text
+VITE_SUPABASE_URL
+VITE_SUPABASE_KEY
+```
+
+Authentication is an integration, not part of the application's business rules.
+
+---
+
+## Validation
+
+Application request validation can be configured with Zod schemas.
+
+```ts
+builder.addPipeline((config) => {
+  config.schemas = {
+    CreateUser: createUserSchema,
+    UpdateUser: updateUserSchema,
+  }
+})
+```
+
+Validation is executed as part of the application pipeline.
+
+Zod remains optional until validation schemas are actually configured.
+
+---
+
+## Query caching
+
+The package includes an in-memory cache path for query requests.
+
+Enable it through the pipeline configuration:
+
+```ts
+builder.addPipeline((config) => {
+  config.queryCaching = true
+})
+```
+
+Cache keys can be contextual or user-scoped through the shared cache key
+builder.
+
+---
+
+## Bootstrap
+
+A complete browser composition root can look like this:
+
+```ts
+import { XenoAppBuilder } from '@xeno-js/vue'
+
+const builder = XenoAppBuilder.create()
+  .addContext(() => {})
+  .addLogger((config) => {
+    config.console = true
+  })
+  .addAuth((config, env) => {
+    config.url = env.getOrThrow('SUPABASE_URL')
+    config.key = env.getOrThrow('SUPABASE_KEY')
+  })
+  .addPipeline((config) => {
+    config.queryCaching = true
+    config.threshold = 500
+  })
+
+export async function bootstrap() {
+  return builder.build()
+}
+```
+
+The builder executes the registered tasks and returns a frozen application
+registry.
+
+The composition root is application code: there is no requirement to hide it
+behind Vue plugins or decorators.
+
+---
+
+## Providing services to Vue
+
+The package exports `XENO_SERVICES_KEY` so the application registry can be made
+available through Vue's `provide/inject` mechanism.
+
+```ts
 import { createApp } from 'vue'
+import { XENO_SERVICES_KEY } from '@xeno-js/vue'
+
 import App from './App.vue'
 import { bootstrap } from './bootstrap'
-import { XENO_SERVICES_KEY, ServicesUtils } from '@xeno-js/vue'
 
 async function mountApp() {
-  try {
-    const app = createApp(App)
-    const container = await bootstrap()
+  const app = createApp(App)
+  const services = await bootstrap()
 
-    // Provide the Xeno IoC container globally to all components
-    app.provide(XENO_SERVICES_KEY, container)
-
-    // Register global services utility for composables
-    ServicesUtils.setGlobalServices(container)
-
-    app.mount('#app')
-  } catch (error) {
-    console.error('Critical error during frontend bootstrap:', error)
-  }
+  app.provide(XENO_SERVICES_KEY, services)
+  app.mount('#app')
 }
 
 mountApp()
 ```
 
-### 3. CQRS Composable Usage (`src/features/users/use-create-user.ts`)
+From there, your application code can resolve the registry through Vue's normal
+dependency injection mechanism.
 
-```typescript
-import { ref } from 'vue'
-import { Result } from '@xeno-js/shared'
-import { ServicesUtils } from '@/use-app'
-import { CreateUserCommand } from './create-user.command'
+The package does not require a custom state-management abstraction.
 
-export function useCreateUser() {
-  const loading = ref(false)
-  const error = ref<string | null>(null)
+---
 
-  const execute = async (payload: { email: string; name: string }) => {
-    if (loading.value) return Result.fail(new Error('Already executing'))
-    loading.value = true
-    error.value = null
+## Keeping application logic outside components
 
-    try {
-      // Safely resolve the Mediator from the Xeno Container
-      const { mediator, BFF_REMOTE_DS: bffRemoteDs } = ServicesUtils.useApp()
-      const command = new CreateUserCommand()
+A component can remain focused on presentation while application behavior lives
+in a composable or application service written by your project.
 
-      const result = await mediator.send(command, async () => {
-        const apiResult = await bffRemoteDs.post('/v1/users', payload)
+For example:
 
-        if (!apiResult.isOk()) return Result.fail(apiResult.getErrorOrThrow())
-        return Result.ok(apiResult.getValueOrThrow())
-      })
+```ts
+import { inject } from 'vue'
+import { XENO_SERVICES_KEY } from '@xeno-js/vue'
 
-      if (!result.isOk()) {
-        error.value = result.getErrorOrThrow().message
-      }
+export function useUsersApplication() {
+  const services = inject(XENO_SERVICES_KEY)
 
-      return result
-    } finally {
-      loading.value = false
-    }
+  if (!services) {
+    throw new Error('Xeno services are not available')
   }
 
-  return { loading, error, execute }
+  return services
 }
 ```
 
+The composable belongs to your application.
+
+Xeno provides the application infrastructure it uses.
+
 ---
 
-## 🛠 Scaffold your project with CLI
+## Public API
 
-Xeno includes an official CLI tool, `@xeno-js/cli`, designed to bootstrap your
-new application in seconds. It offers an interactive setup for Vue projects,
-instantly scaffolding the CQRS files, composables, and dependency injection
-boundaries.
+The package root currently exposes:
 
-```bash
-# Generate a new Vue project
-npx @xeno-js/cli new my-frontend-app --vue
-
-# Generate a Vue Command with its Composable
-npx @xeno-js/cli g command CreateUser --vue
-
+```text
+XenoAppBuilder
+RemoteDataSource
+XENO_SERVICES_KEY
 ```
 
-Check the **[CLI Documentation](https://www.xeno-js.it/cli/overview)** for full
-options.
+It also re-exports the public contracts and primitives from `@xeno-js/shared`.
+
+The concrete internal pipeline implementations are assembled by the builder and
+are not intended to be the primary public API of the package.
 
 ---
 
-## 🤝 For Contributors
+## Installation
 
-We welcome contributions to Xeno! To maintain the highest code quality and
-stability of the core framework, **direct pushes to the `main` and `develop`
-branches are strictly prohibited.** Please follow this Git Flow to contribute:
+Install Vue, Shared, and Xeno Vue:
 
-1. **Branch off from `develop**`: Create a new branch for your feature or
-   bugfix.
+```bash
+npm install @xeno-js/vue @xeno-js/shared vue
+```
+
+Install the integrations you actually use.
+
+For HTTP data sources:
+
+```bash
+npm install axios
+```
+
+For validation:
+
+```bash
+npm install zod
+```
+
+For Supabase authentication:
+
+```bash
+npm install @supabase/supabase-js
+```
+
+For Sentry:
+
+```bash
+npm install @sentry/vue
+```
+
+For Vue Router integration:
+
+```bash
+npm install vue-router
+```
+
+---
+
+## CLI
+
+The Xeno ecosystem includes an official CLI for creating Vue application
+structures:
+
+```bash
+npx @xeno-js/cli new my-app --vue
+```
+
+You can also generate application components inside an existing project:
+
+```bash
+npx @xeno-js/cli g command CreateUser --vue
+```
+
+CLI:
+
+https://github.com/xeno-js/xeno-cli
+
+---
+
+## Xeno ecosystem
+
+```text
+@xeno-js/shared
+    Define the application.
+
+@xeno-js/core
+    Execute the backend application.
+
+@xeno-js/vue
+    Bring the application architecture to Vue.
+
+@xeno-js/cli
+    Get started with the structure.
+```
+
+A useful mental model is:
+
+```text
+Transport
+    hosts the application
+
+Application
+    executes use cases
+
+Domain
+    defines business rules
+
+Infrastructure
+    connects external systems
+```
+
+---
+
+## Keep your stack
+
+Xeno Vue does not replace Vue.
+
+It does not replace your router.
+
+It does not replace your state management solution.
+
+It provides a place for application behavior and infrastructure composition to
+live alongside the tools you already use.
+
+---
+
+## Browser environment
+
+The default configuration service is designed for Vite/browser applications.
+
+The package provides browser-oriented request context data and integrates with
+Vue's dependency injection system.
+
+Node.js `20+` is required by the package tooling.
+
+---
+
+## Development
+
+Clone the repository:
+
+```bash
+git clone https://github.com/xeno-js/xeno-fe.git
+cd xeno-fe
+npm install
+```
+
+Run the checks:
+
+```bash
+npm run check
+```
+
+Useful commands:
+
+```bash
+npm run build
+npm run typecheck
+npm run lint
+npm run test
+npm run test:coverage
+npm run format
+```
+
+Development happens from feature branches targeting `develop`.
+
+---
+
+## Contributing
+
+Contributions are welcome.
+
+Create a feature branch from `develop`:
 
 ```bash
 git checkout develop
 git pull origin develop
-git checkout -b feat/your-awesome-feature
-
+git checkout -b feat/your-feature
 ```
 
-2. **Make your changes**: Write your code and ensure it passes all local checks
-   (linting, types, and tests).
+Run the project checks before opening a pull request:
 
 ```bash
 npm run check
-
 ```
 
-3. **Commit your changes**: We enforce
-   [Conventional Commits](https://www.conventionalcommits.org/?utm_source=gemini).
-   Husky will verify your commit message format.
-4. **Commit Format:**
+We use Conventional Commits:
 
-```bash
-feat(scope): add new feature
-fix(scope): resolve bug
-chore(scope): update dependencies
-
+```text
+feat(vue): add application service
+fix(datasource): correct request handling
+refactor(builder): simplify bootstrap
+docs(readme): clarify architecture
 ```
 
-5. **Submit a Pull Request (PR)**: Push your branch to GitHub and open a Pull
-   Request targeting the **`develop`** branch.
-6. **Review**: The repository owner will review your code, run pipeline tests,
-   and merge it into `develop`.
+Open pull requests against:
 
-_Note: The `main` branch is strictly reserved for production releases. Code
-flows from feature branches ➡️ `develop` ➡️ `main`._
-
-### Scripts
-
-| Command                 | Description                                    |
-| ----------------------- | ---------------------------------------------- |
-| `npm run build`         | Builds the TypeScript source code into `dist/` |
-| `npm run typecheck`     | Checks types without emitting files            |
-| `npm run lint`          | Runs ESLint                                    |
-| `npm run format`        | Formats code with Prettier                     |
-| `npm run test`          | Runs the Vitest test suite                     |
-| `npm run test:coverage` | Runs tests and generates a coverage report     |
-
-### Code Quality (Husky & Git Hooks)
-
-This project strictly enforces code quality rules before pushing to the
-repository:
-
-- **`pre-commit`**: Runs `lint-staged` on staged files (ESLint + Prettier).
-- **`commit-msg`**: Checks commit messages with `commitlint` (we use
-  Conventional Commits).
-- **`pre-push`**: Runs type checking, linting, and testing before code leaves
-  your machine.
+```text
+develop
+```
 
 ---
 
-## 🌱 Support & Appreciation
+## Support
 
-Building, benchmarking, and maintaining a progressive, enterprise-ready
-open-source framework requires a massive amount of continuous dedication and
-architectural engineering.
+If Xeno is useful to you, you can support the project through the community and
+sponsorship channels documented on the website:
 
-If Xeno has brought value to your development workflows, helped decouple your
-core business logic, or simplified your system infrastructure layout, consider
-supporting its open-source lifecycle. Your backing directly accelerates our
-strategic roadmap for new out-of-the-box transport integrations and keeps the
-documentation pristine.
-
-**Want to know how you can contribute or sponsor Xeno?** We rely on the
-commitment of our community to keep the project independent and thriving.
-Whether you are an individual developer or a business using Xeno, your support
-makes a real difference.
-
-👉
-**[Read our support guidelines and find out how to help](https://www.xeno-js.it/support-us)**
-
-Thank you for being part of this decoupled open-source journey!
-
-<amp-bounce>
-</amp-bounce>
-<a href="https://www.buymeacoffee.com/xenojs" target="_blank">
-<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="42" style="height: 42px !important;" />
-</a>
+**[Support Xeno](https://www.xeno-js.it/docs/support-us)**
 
 ---
 
-## 🛡️ Powered by Xeno
+## License
 
-If you are using Xeno in your project, let the world know! Add this badge to
-your README:
+Copyright (c) 2026 Xeno.
 
-```html
-<a
-  href="[https://github.com/xeno-js/xeno-fe](https://github.com/xeno-js/xeno-fe)"
-  target="_blank"
->
-  <img
-    src="[https://img.shields.io/badge/Powered%20by-Xeno-black?style=flat-square](https://img.shields.io/badge/Powered%20by-Xeno-black?style=flat-square)"
-    alt="Powered by Xeno"
-    height="20"
-  />
-</a>
-```
-
-## 📄 License
-
-Copyright (c) 2026 Xeno. Licensed under the
-[ISC License](https://www.google.com/search?q=LICENSE&utm_source=gemini).
+Licensed under the [MIT License](LICENSE).

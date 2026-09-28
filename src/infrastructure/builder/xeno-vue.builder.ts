@@ -37,6 +37,8 @@ export const XENO_SERVICES_KEY: InjectionKey<XenoVueRegistry> = Symbol('XENO_SER
 export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry> {
   private readonly _configService: IConfigurationService
   private readonly _tasks: ((srv: Partial<TRegistry>) => Promise<void>)[] = []
+  private _services: Partial<TRegistry> = {}
+  private _isBuilded = false
 
   private readonly _loggerConfig: LoggerConfig = {
     console: true,
@@ -253,14 +255,15 @@ export class XenoAppBuilder<TRegistry extends XenoVueRegistry = XenoVueRegistry>
    * @returns A promise that resolves to the resulting services.
    */
   public async build(): Promise<TRegistry> {
-    try {
-      const services: Partial<TRegistry> = {}
+    if (this._isBuilded) return Object.freeze(this._services as TRegistry)
 
+    try {
       for (const task of this._tasks) {
-        await task(services)
+        await task(this._services)
       }
 
-      return Object.freeze(services as TRegistry)
+      this._isBuilded = true
+      return Object.freeze(this._services as TRegistry)
     } catch (error: unknown) {
       throw new Error(`Error during application bootstrap: ${(error as Error).message}.`, {
         cause: error,
