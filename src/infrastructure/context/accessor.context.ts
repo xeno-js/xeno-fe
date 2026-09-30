@@ -27,6 +27,10 @@ export class RequestContextAccessor
   implements IContextAccessor<RequestContext>, IIdentityAccessor, INetworkContextAccessor
 {
   public getContext(): Optional<RequestContext> {
+    const path = Guards.isDefined(window)
+      ? SanitizeHelper.sanitizePath(window.location.pathname)
+      : '/'
+    const href = Guards.isDefined(window) ? window.location.origin : 'http://localhost:3000'
     return {
       identity: GUEST as unknown as Identity,
       network: {
@@ -36,12 +40,10 @@ export class RequestContextAccessor
           ? SanitizeHelper.stripControlChars(navigator.userAgent, 256)
           : 'unknown',
         formatIndicator: 'browser',
-        path: Guards.isDefined(window)
-          ? SanitizeHelper.sanitizePath(window.location.pathname)
-          : '/',
+        path,
         transport: {
-          req: '',
-          res: '',
+          req: { ...new Request(href), path: path ?? '/' },
+          res: new Response(),
         },
         csrf: '',
         csrfCookie: '',
