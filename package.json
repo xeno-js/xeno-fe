@@ -1,6 +1,6 @@
 {
   "name": "@xeno-js/vue",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Application architecture for Vue with explicit dependency injection, CQRS, composable pipelines, and clear application boundaries.",
   "repository": {
     "type": "git",
