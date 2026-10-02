@@ -1,6 +1,18 @@
-## [0.1.7](https://github.com/xeno-js/xeno-fe/compare/v1.0.0...v0.1.7) (2026-09-30)
+## [1.0.2](https://github.com/xeno-js/xeno-fe/compare/v1.0.1...v1.0.2) (2026-10-02)
 
-# [1.0.0](https://github.com/xeno-js/xeno-fe/compare/d6fe91ce17199d81bb6e6dd3b6a6ddc1765a6ff5...v1.0.0) (2026-09-30)
+## [1.0.1](https://github.com/xeno-js/xeno-fe/compare/v0.1.7...v1.0.1) (2026-10-02)
+
+### Bug Fixes
+
+- rename auth service interface
+  ([4aff11e](https://github.com/xeno-js/xeno-fe/commit/4aff11eedc15d5a83f527ef3db9e323dad65619d))
+
+### Features
+
+- update datasources
+  ([7558706](https://github.com/xeno-js/xeno-fe/commit/7558706867c65650e02aa6d7967743101b1d36e1))
+
+## [0.1.7](https://github.com/xeno-js/xeno-fe/compare/d6fe91ce17199d81bb6e6dd3b6a6ddc1765a6ff5...v0.1.7) (2026-09-27)
 
 ### Bug Fixes
 
@@ -8,8 +20,6 @@
   ([61a3278](https://github.com/xeno-js/xeno-fe/commit/61a32786216da02e7315177fe0c21610e4a0dd5d))
 - fixato oggettto network
   ([5bbcd44](https://github.com/xeno-js/xeno-fe/commit/5bbcd4496c17bec61d6014e889ea3de22063a55a))
-- rename auth service interface
-  ([4aff11e](https://github.com/xeno-js/xeno-fe/commit/4aff11eedc15d5a83f527ef3db9e323dad65619d))
 - resolve csrf token mismatch with dynamic interceptor injection
   ([ded6554](https://github.com/xeno-js/xeno-fe/commit/ded65545dee748afff34c968049ef292e33af1e0))
 - update export
@@ -29,8 +39,6 @@
   ([d6fe91c](https://github.com/xeno-js/xeno-fe/commit/d6fe91ce17199d81bb6e6dd3b6a6ddc1765a6ff5))
 - removed resilince from frontend package
   ([3a43beb](https://github.com/xeno-js/xeno-fe/commit/3a43bebca25c86ddbf44d41e0929fad13f8b7c2d))
-- update datasources
-  ([7558706](https://github.com/xeno-js/xeno-fe/commit/7558706867c65650e02aa6d7967743101b1d36e1))
 - update mediator
   ([fc976d5](https://github.com/xeno-js/xeno-fe/commit/fc976d5c1e7b8c33fc93357cc09a571579acafb5))
 - update package
