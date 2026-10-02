@@ -484,7 +484,7 @@ npx @xeno-js/cli g command CreateUser --vue
 
 CLI:
 
-https://github.com/xeno-js/xeno-cli
+[GitHub](https://github.com/xeno-js/xeno-cli)
 
 ---
 
@@ -617,7 +617,7 @@ develop
 If Xeno is useful to you, you can support the project through the community and
 sponsorship channels documented on the website:
 
-**[Support Xeno](https://www.xeno-js.it/docs/support-us)**
+**[Support Xeno](https://www.xeno-js.it/support-us)**
 
 ---
 
