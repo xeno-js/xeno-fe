@@ -1,12 +1,11 @@
 import { SupabaseClient, type SupabaseClientOptions } from '@supabase/supabase-js'
 import type { AuthConfig, IExtendendAuthService, IFactory } from '@xeno-js/shared'
+import { Guards, StorageHelper } from '@xeno-js/shared'
 import {
-  Guards,
-  StorageHelper,
   SupabaseAuthService,
   SupabaseClaimsMapper,
   SupabaseSessionMapper,
-} from '@xeno-js/shared'
+} from '@xeno-js/shared/supabase'
 
 export class SupabaseAuthFactory implements IFactory<
   AuthConfig<SupabaseClientOptions<'public'>>,

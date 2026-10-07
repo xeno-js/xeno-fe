@@ -47,7 +47,7 @@ export class PipelineModule {
     pipelines.push(new PerformancePipeline(logger, config.threshold))
 
     if (Guards.isDefined(config.schemas)) {
-      const { ZodValidatorService } = await import('@xeno-js/shared')
+      const { ZodValidatorService } = await import('@xeno-js/shared/zod')
       const validatorService = new ZodValidatorService(new Map(), logger)
       for (const [intent, schema] of Object.entries(config.schemas)) {
         if (Guards.isDefined(schema)) {
