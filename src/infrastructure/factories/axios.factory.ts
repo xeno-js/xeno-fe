@@ -1,5 +1,6 @@
 import type { HttpClientConfig, IFactory, IHttpClient, Optional } from '@xeno-js/shared'
-import { AxiosHttpClient, Guards } from '@xeno-js/shared'
+import { Guards } from '@xeno-js/shared'
+import { AxiosHttpClient } from '@xeno-js/shared/axios'
 import axios from 'axios'
 
 import type { CookieConfig } from '../modules'
